@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "movies_rating_app", "movies_rating_app.csproj", "{502CF6D8-7B75-45D5-8A8C-EF1E13CB452C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "movies_rating_app.API", "movies_rating_app.API.csproj", "{502CF6D8-7B75-45D5-8A8C-EF1E13CB452C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
