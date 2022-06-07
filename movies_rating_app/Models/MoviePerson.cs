@@ -2,7 +2,7 @@
 
 namespace MoviesRatingApp.API.Models
 {
-    public class MoviePeople
+    public class MoviePerson
     {
         public int ID { get; set; }
         [Required]
