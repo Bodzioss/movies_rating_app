@@ -22,8 +22,6 @@ namespace MoviesRatingApp.API.Models
         public DateTime BirthDate { get; set; }
         [Required]
         public int RoleID { get; set; }
-        [ForeignKey("RoleID")]
-        public virtual Role Role { get; set; }
 
         public virtual ICollection<MoviePerson> MoviePeople { get; set; }
 

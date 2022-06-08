@@ -11,8 +11,6 @@ namespace MoviesRatingApp.API.Models
         [Required]
         public int SeriesID { get; set; }
 
-        [ForeignKey("SeriesID")]
-        public virtual Series Series { get; set; }
         public virtual ICollection<Episode> Episodes { get; set; }
     }
 }
