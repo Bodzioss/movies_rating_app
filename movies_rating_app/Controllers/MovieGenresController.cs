@@ -12,55 +12,55 @@ namespace MoviesRatingApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SeriesController : ControllerBase
+    public class MovieGenresController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public SeriesController(DataContext context)
+        public MovieGenresController(DataContext context)
         {
             _context = context;
         }
 
-        // GET: api/Series
+        // GET: api/MovieGenres
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Series>>> GetTVSeries()
+        public async Task<ActionResult<IEnumerable<MovieGenre>>> GetMovieGenres()
         {
-          if (_context.TVSeries == null)
+          if (_context.MovieGenres == null)
           {
               return NotFound();
           }
-            return await _context.TVSeries.ToListAsync();
+            return await _context.MovieGenres.ToListAsync();
         }
 
-        // GET: api/Series/5
+        // GET: api/MovieGenres/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Series>> GetSeries(int id)
+        public async Task<ActionResult<MovieGenre>> GetMovieGenre(int id)
         {
-          if (_context.TVSeries == null)
+          if (_context.MovieGenres == null)
           {
               return NotFound();
           }
-            var series = await _context.TVSeries.FindAsync(id);
+            var movieGenre = await _context.MovieGenres.FindAsync(id);
 
-            if (series == null)
+            if (movieGenre == null)
             {
                 return NotFound();
             }
 
-            return series;
+            return movieGenre;
         }
 
-        // PUT: api/Series/5
+        // PUT: api/MovieGenres/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSeries(int id, Series series)
+        public async Task<IActionResult> PutMovieGenre(int id, MovieGenre movieGenre)
         {
-            if (id != series.ID)
+            if (id != movieGenre.ID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(series).State = EntityState.Modified;
+            _context.Entry(movieGenre).State = EntityState.Modified;
 
             try
             {
@@ -68,7 +68,7 @@ namespace MoviesRatingApp.API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SeriesExists(id))
+                if (!MovieGenreExists(id))
                 {
                     return NotFound();
                 }
@@ -81,44 +81,44 @@ namespace MoviesRatingApp.API.Controllers
             return NoContent();
         }
 
-        // POST: api/Series
+        // POST: api/MovieGenres
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Series>> PostSeries(Series series)
+        public async Task<ActionResult<MovieGenre>> PostMovieGenre(MovieGenre movieGenre)
         {
-          if (_context.TVSeries == null)
+          if (_context.MovieGenres == null)
           {
-              return Problem("Entity set 'DataContext.TVSeries'  is null.");
+              return Problem("Entity set 'DataContext.MovieGenres'  is null.");
           }
-            _context.TVSeries.Add(series);
+            _context.MovieGenres.Add(movieGenre);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSeries", new { id = series.ID }, series);
+            return CreatedAtAction("GetMovieGenre", new { id = movieGenre.ID }, movieGenre);
         }
 
-        // DELETE: api/Series/5
+        // DELETE: api/MovieGenres/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSeries(int id)
+        public async Task<IActionResult> DeleteMovieGenre(int id)
         {
-            if (_context.TVSeries == null)
+            if (_context.MovieGenres == null)
             {
                 return NotFound();
             }
-            var series = await _context.TVSeries.FindAsync(id);
-            if (series == null)
+            var movieGenre = await _context.MovieGenres.FindAsync(id);
+            if (movieGenre == null)
             {
                 return NotFound();
             }
 
-            _context.TVSeries.Remove(series);
+            _context.MovieGenres.Remove(movieGenre);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool SeriesExists(int id)
+        private bool MovieGenreExists(int id)
         {
-            return (_context.TVSeries?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.MovieGenres?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
