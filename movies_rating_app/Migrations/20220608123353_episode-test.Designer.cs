@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoviesRatingApp.Data;
 
@@ -11,9 +12,10 @@ using MoviesRatingApp.Data;
 namespace MoviesRatingApp.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220608123353_episode-test")]
+    partial class episodetest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -247,22 +249,24 @@ namespace MoviesRatingApp.API.Migrations
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Episode", b =>
                 {
-                    b.HasOne("MoviesRatingApp.API.Models.Season", null)
-                        .WithMany("Episodes")
+                    b.HasOne("MoviesRatingApp.API.Models.Season", "Season")
+                        .WithMany()
                         .HasForeignKey("SeasonID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Season");
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.MovieGenre", b =>
                 {
-                    b.HasOne("MoviesRatingApp.API.Models.Genre", null)
+                    b.HasOne("MoviesRatingApp.API.Models.Genre", "Genre")
                         .WithMany("MovieGenres")
                         .HasForeignKey("GenreID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MoviesRatingApp.API.Models.Movie", null)
+                    b.HasOne("MoviesRatingApp.API.Models.Movie", "Movie")
                         .WithMany("MovieGenres")
                         .HasForeignKey("MovieID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -271,17 +275,21 @@ namespace MoviesRatingApp.API.Migrations
                     b.HasOne("MoviesRatingApp.API.Models.Series", null)
                         .WithMany("MovieGenres")
                         .HasForeignKey("SeriesID");
+
+                    b.Navigation("Genre");
+
+                    b.Navigation("Movie");
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.MoviePerson", b =>
                 {
-                    b.HasOne("MoviesRatingApp.API.Models.Movie", null)
+                    b.HasOne("MoviesRatingApp.API.Models.Movie", "Movie")
                         .WithMany("MoviePeople")
                         .HasForeignKey("MovieID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MoviesRatingApp.API.Models.Person", null)
+                    b.HasOne("MoviesRatingApp.API.Models.Person", "Person")
                         .WithMany("MoviePeople")
                         .HasForeignKey("PersonID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -290,24 +298,32 @@ namespace MoviesRatingApp.API.Migrations
                     b.HasOne("MoviesRatingApp.API.Models.Series", null)
                         .WithMany("MoviePeople")
                         .HasForeignKey("SeriesID");
+
+                    b.Navigation("Movie");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Person", b =>
                 {
-                    b.HasOne("MoviesRatingApp.API.Models.Role", null)
+                    b.HasOne("MoviesRatingApp.API.Models.Role", "Role")
                         .WithMany("People")
                         .HasForeignKey("RoleID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Season", b =>
                 {
-                    b.HasOne("MoviesRatingApp.API.Models.Series", null)
+                    b.HasOne("MoviesRatingApp.API.Models.Series", "Series")
                         .WithMany("Seasons")
                         .HasForeignKey("SeriesID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Series");
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Genre", b =>
@@ -330,11 +346,6 @@ namespace MoviesRatingApp.API.Migrations
             modelBuilder.Entity("MoviesRatingApp.API.Models.Role", b =>
                 {
                     b.Navigation("People");
-                });
-
-            modelBuilder.Entity("MoviesRatingApp.API.Models.Season", b =>
-                {
-                    b.Navigation("Episodes");
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Series", b =>
