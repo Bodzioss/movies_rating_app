@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoviesRatingApp.Data;
 
@@ -11,9 +12,10 @@ using MoviesRatingApp.Data;
 namespace MoviesRatingApp.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220608211335_updateRole")]
+    partial class updateRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,8 +179,6 @@ namespace MoviesRatingApp.API.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("RoleID");
-
                     b.ToTable("People");
                 });
 
@@ -290,17 +290,6 @@ namespace MoviesRatingApp.API.Migrations
                     b.HasOne("MoviesRatingApp.API.Models.Series", null)
                         .WithMany("MoviePeople")
                         .HasForeignKey("SeriesID");
-                });
-
-            modelBuilder.Entity("MoviesRatingApp.API.Models.Person", b =>
-                {
-                    b.HasOne("MoviesRatingApp.API.Models.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Season", b =>

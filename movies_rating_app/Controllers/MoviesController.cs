@@ -12,55 +12,55 @@ namespace MoviesRatingApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SeriesController : ControllerBase
+    public class MoviesController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public SeriesController(DataContext context)
+        public MoviesController(DataContext context)
         {
             _context = context;
         }
 
-        // GET: api/Series
+        // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Series>>> GetTVSeries()
+        public async Task<ActionResult<IEnumerable<Movie>>> GetMovies()
         {
-          if (_context.TVSeries == null)
+          if (_context.Movies == null)
           {
               return NotFound();
           }
-            return await _context.TVSeries.ToListAsync();
+            return await _context.Movies.ToListAsync();
         }
 
-        // GET: api/Series/5
+        // GET: api/Movies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Series>> GetSeries(int id)
+        public async Task<ActionResult<Movie>> GetMovie(int id)
         {
-          if (_context.TVSeries == null)
+          if (_context.Movies == null)
           {
               return NotFound();
           }
-            var series = await _context.TVSeries.FindAsync(id);
+            var movie = await _context.Movies.FindAsync(id);
 
-            if (series == null)
+            if (movie == null)
             {
                 return NotFound();
             }
 
-            return series;
+            return movie;
         }
 
-        // PUT: api/Series/5
+        // PUT: api/Movies/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSeries(int id, Series series)
+        public async Task<IActionResult> PutMovie(int id, Movie movie)
         {
-            if (id != series.ID)
+            if (id != movie.ID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(series).State = EntityState.Modified;
+            _context.Entry(movie).State = EntityState.Modified;
 
             try
             {
@@ -68,7 +68,7 @@ namespace MoviesRatingApp.API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SeriesExists(id))
+                if (!MovieExists(id))
                 {
                     return NotFound();
                 }
@@ -81,44 +81,44 @@ namespace MoviesRatingApp.API.Controllers
             return NoContent();
         }
 
-        // POST: api/Series
+        // POST: api/Movies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Series>> PostSeries(Series series)
+        public async Task<ActionResult<Movie>> PostMovie(Movie movie)
         {
-          if (_context.TVSeries == null)
+          if (_context.Movies == null)
           {
-              return Problem("Entity set 'DataContext.TVSeries'  is null.");
+              return Problem("Entity set 'DataContext.Movies'  is null.");
           }
-            _context.TVSeries.Add(series);
+            _context.Movies.Add(movie);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSeries", new { id = series.ID }, series);
+            return CreatedAtAction("GetMovie", new { id = movie.ID }, movie);
         }
 
-        // DELETE: api/Series/5
+        // DELETE: api/Movies/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSeries(int id)
+        public async Task<IActionResult> DeleteMovie(int id)
         {
-            if (_context.TVSeries == null)
+            if (_context.Movies == null)
             {
                 return NotFound();
             }
-            var series = await _context.TVSeries.FindAsync(id);
-            if (series == null)
+            var movie = await _context.Movies.FindAsync(id);
+            if (movie == null)
             {
                 return NotFound();
             }
 
-            _context.TVSeries.Remove(series);
+            _context.Movies.Remove(movie);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool SeriesExists(int id)
+        private bool MovieExists(int id)
         {
-            return (_context.TVSeries?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Movies?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

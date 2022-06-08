@@ -12,55 +12,55 @@ namespace MoviesRatingApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SeriesController : ControllerBase
+    public class RolesController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public SeriesController(DataContext context)
+        public RolesController(DataContext context)
         {
             _context = context;
         }
 
-        // GET: api/Series
+        // GET: api/Roles
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Series>>> GetTVSeries()
+        public async Task<ActionResult<IEnumerable<Role>>> GetRoles()
         {
-          if (_context.TVSeries == null)
+          if (_context.Roles == null)
           {
               return NotFound();
           }
-            return await _context.TVSeries.ToListAsync();
+            return await _context.Roles.ToListAsync();
         }
 
-        // GET: api/Series/5
+        // GET: api/Roles/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Series>> GetSeries(int id)
+        public async Task<ActionResult<Role>> GetRole(int id)
         {
-          if (_context.TVSeries == null)
+          if (_context.Roles == null)
           {
               return NotFound();
           }
-            var series = await _context.TVSeries.FindAsync(id);
+            var role = await _context.Roles.FindAsync(id);
 
-            if (series == null)
+            if (role == null)
             {
                 return NotFound();
             }
 
-            return series;
+            return role;
         }
 
-        // PUT: api/Series/5
+        // PUT: api/Roles/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSeries(int id, Series series)
+        public async Task<IActionResult> PutRole(int id, Role role)
         {
-            if (id != series.ID)
+            if (id != role.ID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(series).State = EntityState.Modified;
+            _context.Entry(role).State = EntityState.Modified;
 
             try
             {
@@ -68,7 +68,7 @@ namespace MoviesRatingApp.API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SeriesExists(id))
+                if (!RoleExists(id))
                 {
                     return NotFound();
                 }
@@ -81,44 +81,44 @@ namespace MoviesRatingApp.API.Controllers
             return NoContent();
         }
 
-        // POST: api/Series
+        // POST: api/Roles
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Series>> PostSeries(Series series)
+        public async Task<ActionResult<Role>> PostRole(Role role)
         {
-          if (_context.TVSeries == null)
+          if (_context.Roles == null)
           {
-              return Problem("Entity set 'DataContext.TVSeries'  is null.");
+              return Problem("Entity set 'DataContext.Roles'  is null.");
           }
-            _context.TVSeries.Add(series);
+            _context.Roles.Add(role);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSeries", new { id = series.ID }, series);
+            return CreatedAtAction("GetRole", new { id = role.ID }, role);
         }
 
-        // DELETE: api/Series/5
+        // DELETE: api/Roles/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSeries(int id)
+        public async Task<IActionResult> DeleteRole(int id)
         {
-            if (_context.TVSeries == null)
+            if (_context.Roles == null)
             {
                 return NotFound();
             }
-            var series = await _context.TVSeries.FindAsync(id);
-            if (series == null)
+            var role = await _context.Roles.FindAsync(id);
+            if (role == null)
             {
                 return NotFound();
             }
 
-            _context.TVSeries.Remove(series);
+            _context.Roles.Remove(role);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool SeriesExists(int id)
+        private bool RoleExists(int id)
         {
-            return (_context.TVSeries?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Roles?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

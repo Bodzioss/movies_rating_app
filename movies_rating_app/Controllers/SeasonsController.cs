@@ -2,7 +2,7 @@
 
 namespace MoviesRatingApp.API.Controllers
 {
-    public class SeasonController : Controller
+    public class SeasonsController : Controller
     {
         public IActionResult Index()
         {
