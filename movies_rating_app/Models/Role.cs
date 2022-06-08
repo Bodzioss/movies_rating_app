@@ -8,5 +8,6 @@ namespace MoviesRatingApp.API.Models
         [Required]
         [StringLength(50, ErrorMessage = "Role name cannot be longer than 50 characters.")]
         public string? Name { get; set; }
+        public virtual ICollection<Person> People { get; set; }
     }
 }

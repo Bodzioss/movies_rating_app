@@ -43,7 +43,7 @@ namespace MoviesRatingApp.API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Episodes");
+                    b.ToTable("Episodes", (string)null);
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Genre", b =>
@@ -61,7 +61,7 @@ namespace MoviesRatingApp.API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Genres");
+                    b.ToTable("Genres", (string)null);
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Movie", b =>
@@ -91,7 +91,7 @@ namespace MoviesRatingApp.API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Movies");
+                    b.ToTable("Movies", (string)null);
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.MoviePerson", b =>
@@ -110,7 +110,7 @@ namespace MoviesRatingApp.API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("MoviePeople");
+                    b.ToTable("MoviePeople", (string)null);
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Person", b =>
@@ -144,7 +144,7 @@ namespace MoviesRatingApp.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("People");
+                    b.ToTable("People", (string)null);
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Role", b =>
@@ -162,7 +162,7 @@ namespace MoviesRatingApp.API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Season", b =>
@@ -181,7 +181,7 @@ namespace MoviesRatingApp.API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Seasons");
+                    b.ToTable("Seasons", (string)null);
                 });
 
             modelBuilder.Entity("MoviesRatingApp.API.Models.Series", b =>
@@ -208,7 +208,7 @@ namespace MoviesRatingApp.API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("TVSeries");
+                    b.ToTable("TVSeries", (string)null);
                 });
 #pragma warning restore 612, 618
         }

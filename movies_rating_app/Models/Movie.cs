@@ -6,9 +6,6 @@ namespace MoviesRatingApp.API.Models
     public class Movie
     {
         public int ID { get; set; }
-        [ForeignKey("Id")]
-        public int DirectorID { get; set; }
-        public int GenreID { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "Title cannot be longer than 50 characters.")]
         public String? Title { get; set; }
@@ -22,5 +19,7 @@ namespace MoviesRatingApp.API.Models
         [Range(1,1000)]
         [Display(Name = "Movie Length")]
         public int MovieLength { get; set; }
+        public virtual ICollection<Genre> Genres { get; set; }
+        public virtual ICollection<MoviePerson> MoviePeople { get; set; }
     }
 }
