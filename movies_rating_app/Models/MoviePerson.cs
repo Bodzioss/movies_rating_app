@@ -10,9 +10,6 @@ namespace MoviesRatingApp.API.Models
         public int PersonID { get; set; }
         [Required]
         public int MovieID { get; set; }
-        [ForeignKey("PersonID")]
-        public virtual Person Person { get; set; }
-        [ForeignKey("MovieID")]
-        public virtual Movie Movie { get; set; }
+
     }
 }
