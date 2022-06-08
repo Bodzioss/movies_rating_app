@@ -1,2 +1,6 @@
-# movies_rating_app
-Aplikacja webowa do oceniania filmów i seriali
+# Movies Rating App
+##Aplikacja webowa do oceniania filmów i seriali
+Użyte technologie
+""
+Docker
+""
