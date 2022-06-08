@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MoviesRatingApp.API.Models
 {
@@ -15,5 +16,7 @@ namespace MoviesRatingApp.API.Models
         public DateTime ReleaseDate { get; set; }
         [Required]
         public int SeasonID { get; set; }
+        [ForeignKey("SeasonID")]
+        public virtual Season Season { get; set; }
     }
 }
