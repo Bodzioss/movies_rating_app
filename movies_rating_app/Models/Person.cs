@@ -20,10 +20,12 @@ namespace MoviesRatingApp.API.Models
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         [Display(Name = "Birth Day")]
         public DateTime BirthDate { get; set; }
+
         [Required]
+        [ForeignKey("RoleID")]
         public int RoleID { get; set; }
 
-        public virtual ICollection<MoviePerson> MoviePeople { get; set; }
+        public virtual Role? Role { get; set; }
 
 
     }

@@ -10,7 +10,8 @@ namespace MoviesRatingApp.API.Models
         public int Number { get; set; }
         [Required]
         public int SeriesID { get; set; }
-
-        public virtual ICollection<Episode> Episodes { get; set; }
+        [ForeignKey("SeriesID")]
+        public virtual Series? Series { get; set; }
+        public virtual ICollection<Episode>? Episodes { get; set; }
     }
 }

@@ -15,6 +15,9 @@ namespace MoviesRatingApp.API.Models
         [Display(Name = "Release Date")]
         public DateTime ReleaseDate { get; set; }
         [Required]
+        [ForeignKey("SeasonID")]
         public int SeasonID { get; set; }
+
+        public virtual Season? Season { get; set; }
     }
 }

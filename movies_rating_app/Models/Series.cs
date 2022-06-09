@@ -17,9 +17,9 @@ namespace MoviesRatingApp.API.Models
         [Display(Name = "End Year")]
         public int EndYear { get; set; }
 
-        public virtual ICollection<Season> Seasons { get; set; }
-        public virtual ICollection<MovieGenre> MovieGenres { get; set; }
-        public virtual ICollection<MoviePerson> MoviePeople { get; set; }
+        public virtual ICollection<Season>? Seasons { get; set; }
+        public virtual ICollection<MovieGenre>? MovieGenres { get; set; }
+        public virtual ICollection<MoviePerson>? MoviePeople { get; set; }
         
 
 

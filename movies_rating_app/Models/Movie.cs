@@ -19,7 +19,8 @@ namespace MoviesRatingApp.API.Models
         [Range(1,1000)]
         [Display(Name = "Movie Length")]
         public int MovieLength { get; set; }
-        public virtual ICollection<MovieGenre> MovieGenres { get; set; }
-        public virtual ICollection<MoviePerson> MoviePeople { get; set; }
+
+        public virtual ICollection<MovieGenre>? MovieGenres { get; set; }
+        public virtual ICollection<MoviePerson>? MoviePeople { get; set; }
     }
 }

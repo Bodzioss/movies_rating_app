@@ -9,6 +9,6 @@ namespace MoviesRatingApp.API.Models
         [StringLength(50, ErrorMessage = "Genre name cannot be longer than 50 characters.")]
         public string? Name { get; set; }
 
-        public virtual ICollection<MovieGenre> MovieGenres { get; set; }
+        public virtual ICollection<MovieGenre>? MovieGenres { get; set; }
     }
 }
