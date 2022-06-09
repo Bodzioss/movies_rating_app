@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace MoviesRatingApp.API.Models
 {
@@ -16,9 +17,11 @@ namespace MoviesRatingApp.API.Models
         [Range(1800, 2100)]
         [Display(Name = "End Year")]
         public int EndYear { get; set; }
-
+        [JsonIgnore]
         public virtual ICollection<Season>? Seasons { get; set; }
+        [JsonIgnore]
         public virtual ICollection<MovieGenre>? MovieGenres { get; set; }
+        [JsonIgnore]
         public virtual ICollection<MoviePerson>? MoviePeople { get; set; }
         
 

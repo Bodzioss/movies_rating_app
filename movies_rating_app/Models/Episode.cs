@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace MoviesRatingApp.API.Models
 {
@@ -18,6 +19,7 @@ namespace MoviesRatingApp.API.Models
         [ForeignKey("SeasonID")]
         public int SeasonID { get; set; }
 
+        [JsonIgnore]
         public virtual Season? Season { get; set; }
     }
 }

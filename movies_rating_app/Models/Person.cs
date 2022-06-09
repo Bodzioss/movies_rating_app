@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace MoviesRatingApp.API.Models
 {
@@ -22,9 +23,9 @@ namespace MoviesRatingApp.API.Models
         public DateTime BirthDate { get; set; }
 
         [Required]
-        [ForeignKey("RoleID")]
         public int RoleID { get; set; }
-
+        [JsonIgnore]
+        [ForeignKey("RoleID")]
         public virtual Role? Role { get; set; }
 
 
