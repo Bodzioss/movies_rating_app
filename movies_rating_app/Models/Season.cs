@@ -8,8 +8,9 @@ namespace MoviesRatingApp.API.Models
     {
         [Key]
         public int ID { get; set; }
+        [Required(ErrorMessage = "Season number is required")]
         public int Number { get; set; }
-        [Required]
+        [Required(ErrorMessage = "SeriesID is required")]
         public int SeriesID { get; set; }
         [JsonIgnore]
         [ForeignKey("SeriesID")]

@@ -8,9 +8,10 @@ namespace MoviesRatingApp.API.Models
     {
         [Key]
         public int ID { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Title is required")]
         [StringLength(50, ErrorMessage = "Title cannot be longer than 50 characters.")]
         public string? Title { get; set; }
+        [Required(ErrorMessage = "Start year is required")]
         [Range(1800,2100)]
         [Display(Name = "Start Year")]
         public int StartYear { get; set; }

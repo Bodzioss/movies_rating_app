@@ -7,9 +7,9 @@ namespace MoviesRatingApp.API.Models
     public class MoviePerson
     {
         public int ID { get; set; }
-        [Required]
+        [Required(ErrorMessage = "PersonID is required")]
         public int PersonID { get; set; }
-        [Required]
+        [Required(ErrorMessage = "MovieID is required")]
         public int MovieID { get; set; }
         [JsonIgnore]
         [ForeignKey("PersonID")]

@@ -7,13 +7,13 @@ namespace MoviesRatingApp.API.Models
     public class Person
     {
         public int ID { get; set; }
-        [Required]
+        [Required(ErrorMessage = "First name is required")]
         [StringLength(50, ErrorMessage = "First name cannot be longer than 50 characters.")]
         public string? FirstName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Last name is required")]
         [StringLength(50, ErrorMessage = "Last name cannot be longer than 50 characters.")]
         public string? LastName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Nationality is required")]
         [StringLength(50, ErrorMessage = "Nationality cannot be longer than 50 characters.")]
         public string? Nationality { get; set; }
 
