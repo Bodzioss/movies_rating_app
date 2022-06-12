@@ -10,6 +10,7 @@ namespace MoviesRatingApp.API.Models
         [Required(ErrorMessage = "Title is required")]
         [StringLength(50, ErrorMessage = "Title cannot be longer than 50 characters.")]
         public String? Title { get; set; }
+        public String? Description { get; set; }
         [Required(ErrorMessage = "Release date is required")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
