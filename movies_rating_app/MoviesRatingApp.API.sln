@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoviesRatingApp.API", "MoviesRatingApp.API.csproj", "{502CF6D8-7B75-45D5-8A8C-EF1E13CB452C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoviesRatingApp.API", "MoviesRatingApp.API.csproj", "{502CF6D8-7B75-45D5-8A8C-EF1E13CB452C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "..\Entities\Entities.csproj", "{BD77F613-CCC0-4B7A-A664-92BA1BF99A34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "..\Contracts\Contracts.csproj", "{147D5F48-5700-4C82-8DEB-37B19F634084}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "..\Repository\Repository.csproj", "{38141A2F-0127-4254-A0AC-692A48CA3002}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,18 @@ Global
 		{502CF6D8-7B75-45D5-8A8C-EF1E13CB452C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{502CF6D8-7B75-45D5-8A8C-EF1E13CB452C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{502CF6D8-7B75-45D5-8A8C-EF1E13CB452C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD77F613-CCC0-4B7A-A664-92BA1BF99A34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD77F613-CCC0-4B7A-A664-92BA1BF99A34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD77F613-CCC0-4B7A-A664-92BA1BF99A34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD77F613-CCC0-4B7A-A664-92BA1BF99A34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{147D5F48-5700-4C82-8DEB-37B19F634084}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{147D5F48-5700-4C82-8DEB-37B19F634084}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{147D5F48-5700-4C82-8DEB-37B19F634084}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{147D5F48-5700-4C82-8DEB-37B19F634084}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38141A2F-0127-4254-A0AC-692A48CA3002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38141A2F-0127-4254-A0AC-692A48CA3002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38141A2F-0127-4254-A0AC-692A48CA3002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38141A2F-0127-4254-A0AC-692A48CA3002}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace MoviesRatingApp.API.Models
+namespace Entities.Models
 {
     public class Person
     {

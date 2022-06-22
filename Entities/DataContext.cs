@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MoviesRatingApp.API.Models;
+using Entities.Models;
 
-namespace MoviesRatingApp.Data
+namespace Entities
 {
     public class DataContext : DbContext
     {

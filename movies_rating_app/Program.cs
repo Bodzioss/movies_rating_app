@@ -1,5 +1,7 @@
-global using MoviesRatingApp.Data;
 global using Microsoft.EntityFrameworkCore;
+using Contracts;
+using Entities;
+using Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
