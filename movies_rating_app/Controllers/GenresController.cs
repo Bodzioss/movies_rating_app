@@ -80,7 +80,7 @@ namespace MoviesRatingApp.API.Controllers
             _context.Genres.Add(genre);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEpisode", new { id = genre.ID }, genre);
+            return CreatedAtAction("GetGenre", new { id = genre.ID }, genre);
         }
 
         [HttpDelete("id")]
