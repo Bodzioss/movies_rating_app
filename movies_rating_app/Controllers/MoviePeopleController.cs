@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Entities;
+using Entities.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MoviesRatingApp.API.Models;
 
 namespace MoviesRatingApp.API.Controllers
 {
