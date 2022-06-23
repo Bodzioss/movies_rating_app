@@ -14,5 +14,31 @@ namespace Repository
         public EpisodeRepository(DataContext dataContext) : base(dataContext)
         {
         }
+
+        public IEnumerable<Episode> GetAllEpisodes()
+        {
+            return GetAll().OrderBy(x => x.Season.Number).OrderBy(x => x.Number).ToList();
+        }
+
+        public Episode GetEpisodeById(int episodeID)
+        {
+            return GetByCondition(x => x.ID.Equals(episodeID))
+            .FirstOrDefault();
+        }
+
+        public void CreateEpisode(Episode episode)
+        {
+            Create(episode);
+        }
+
+        public void UpdateEpisode(Episode episode)
+        {
+            Update(episode);
+        }
+
+        public void DeleteEpisode(Episode episode)
+        {
+            Delete(episode);
+        }
     }
 }

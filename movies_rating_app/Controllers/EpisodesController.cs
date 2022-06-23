@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Contracts;
 using Entities;
+using Entities.DataTransferObjects.EpisodeDtos;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,111 +17,145 @@ namespace MoviesRatingApp.API.Controllers
     [ApiController]
     public class EpisodesController : ControllerBase
     {
-        private readonly DataContext _context;
-
-        public EpisodesController(DataContext context)
+        private ILoggerManager _logger;
+        private IRepositoryWrapper _repository;
+        private IMapper _mapper;
+        public EpisodesController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper)
         {
-            _context = context;
+            _logger = logger;
+            _repository = repository;
+            _mapper = mapper;
         }
 
         // GET: api/Episodes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Episode>>> GetEpisodes()
+        public IActionResult GetAllEpisodes()
         {
-          if (_context.Episodes == null)
-          {
-              return NotFound();
-          }
-            return await _context.Episodes.ToListAsync();
-        }
-
-        // GET: api/Episodes/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Episode>> GetEpisode(int id)
-        {
-          if (_context.Episodes == null)
-          {
-              return NotFound();
-          }
-            var episode = await _context.Episodes.FindAsync(id);
-
-            if (episode == null)
-            {
-                return NotFound();
-            }
-
-            return episode;
-        }
-
-        // PUT: api/Episodes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEpisode(int id, Episode episode)
-        {
-            if (id != episode.ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(episode).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var episodes = _repository.Episode.GetAllEpisodes();
+
+                _logger.LogInfo($"Returned all owners from database.");
+
+                var episodesResult = _mapper.Map<IEnumerable<EpisodeDto>>(episodes);
+
+                return Ok(episodesResult);
             }
-            catch (DbUpdateConcurrencyException)
+            catch(Exception ex)
             {
-                if (!EpisodeExists(id))
+                _logger.LogError($"Something went wrong inside GetEpisodes action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetEpisodeById(int id)
+        {
+            try
+            {
+                var episode = _repository.Episode.GetEpisodeById(id);
+                if (episode is null)
                 {
+                    _logger.LogError($"Episode with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 else
                 {
-                    throw;
+                    _logger.LogInfo($"Returned episode with id: {id}");
+                    var episodeResult = _mapper.Map<EpisodeDto>(episode);
+                    return Ok(episodeResult);
                 }
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetEpisodeById action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // POST: api/Episodes
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Episode>> PostEpisode(Episode episode)
+        public IActionResult CreateEpisode([FromBody] EpisodeForCreationDto episode)
         {
-          if (_context.Episodes == null)
-          {
-              return Problem("Entity set 'DataContext.Episodes'  is null.");
-          }
-            _context.Episodes.Add(episode);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetEpisode", new { id = episode.ID }, episode);
+            try
+            {
+                if (episode is null)
+                {
+                    _logger.LogError("Episode object sent from client is null.");
+                    return BadRequest("Episode object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid episode object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var episodeEntity = _mapper.Map<Episode>(episode);
+                _repository.Episode.CreateEpisode(episodeEntity);
+                _repository.Save();
+                var createdEpisode = _mapper.Map<EpisodeDto>(episodeEntity);
+                return CreatedAtRoute("EpisodeById", new { id = createdEpisode.ID }, createdEpisode);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside CreateEpisode action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // DELETE: api/Episodes/5
+        [HttpPut("{id}")]
+        public IActionResult UpdateEpisode(int id, [FromBody] EpisodeForUpdateDto episode)
+        {
+            try
+            {
+                if (episode is null)
+                {
+                    _logger.LogError("Episode object sent from client is null.");
+                    return BadRequest("Episode object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid episode object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var episodeEntity = _repository.Episode.GetEpisodeById(id);
+                if (episodeEntity is null)
+                {
+                    _logger.LogError($"Episode with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _mapper.Map(episode, episodeEntity);
+                _repository.Episode.UpdateEpisode(episodeEntity);
+                _repository.Save();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside UpdateEpisode action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEpisode(int id)
+        public IActionResult DeleteEpisode(int id)
         {
-            if (_context.Episodes == null)
+            try
             {
-                return NotFound();
+                var episode = _repository.Episode.GetEpisodeById(id);
+                if (episode == null)
+                {
+                    _logger.LogError($"Episode with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _repository.Episode.DeleteEpisode(episode);
+                _repository.Save();
+                return NoContent();
             }
-            var episode = await _context.Episodes.FindAsync(id);
-            if (episode == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError($"Something went wrong inside DeleteEpisode action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
             }
-
-            _context.Episodes.Remove(episode);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
-        private bool EpisodeExists(int id)
-        {
-            return (_context.Episodes?.Any(e => e.ID == id)).GetValueOrDefault();
-        }
     }
 }

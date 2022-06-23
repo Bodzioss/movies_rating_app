@@ -9,5 +9,10 @@ namespace Contracts
 {
     public interface IEpisodeRepository : IRepositoryBase<Episode>
     {
+        IEnumerable<Episode> GetAllEpisodes();
+        Episode GetEpisodeById(int episodeID);
+        void CreateEpisode(Episode episode);
+        void UpdateEpisode(Episode episode);
+        void DeleteEpisode(Episode episode);
     }
 }
