@@ -15,29 +15,31 @@ namespace Repository
         {
         }
 
-        public void CreateSeries(Series series)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteSeries(Series series)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<Series> GetAllSeries()
         {
-            throw new NotImplementedException();
+            return GetAll().OrderBy(x => x.Title).ToList();
         }
 
         public Series GetSeriesById(int seriesID)
         {
-            throw new NotImplementedException();
+            return GetByCondition(x => x.ID.Equals(seriesID))
+            .FirstOrDefault();
+        }
+
+        public void CreateSeries(Series series)
+        {
+            Create(series);
         }
 
         public void UpdateSeries(Series series)
         {
-            throw new NotImplementedException();
+            Update(series);
         }
+
+        public void DeleteSeries(Series series)
+        {
+            Delete(series);
+        }
+
     }
 }

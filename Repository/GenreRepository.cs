@@ -17,27 +17,28 @@ namespace Repository
 
         public IEnumerable<Genre> GetAllGenres()
         {
-            throw new NotImplementedException();
+            return GetAll().OrderBy(x => x.Name).ToList();
         }
 
         public Genre GetGenreById(int genreID)
         {
-            throw new NotImplementedException();
+            return GetByCondition(x => x.ID.Equals(genreID))
+            .FirstOrDefault();
         }
 
         public void CreateGenre(Genre genre)
         {
-            throw new NotImplementedException();
+            Create(genre);
         }
 
         public void UpdateGenre(Genre genre)
         {
-            throw new NotImplementedException();
+            Update(genre);
         }
 
         public void DeleteGenre(Genre genre)
         {
-            throw new NotImplementedException();
+            Delete(genre);
         }
     }
 }

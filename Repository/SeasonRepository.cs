@@ -15,29 +15,31 @@ namespace Repository
         {
         }
 
-        public void CreateSeason(Season season)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteSeason(Season season)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<Season> GetAllSeasons()
         {
-            throw new NotImplementedException();
+            return GetAll().OrderBy(x => x.Number).ToList();
         }
 
         public Season GetSeasonById(int seasonID)
         {
-            throw new NotImplementedException();
+            return GetByCondition(x => x.ID.Equals(seasonID))
+            .FirstOrDefault();
+        }
+
+        public void CreateSeason(Season season)
+        {
+            Create(season);
         }
 
         public void UpdateSeason(Season season)
         {
-            throw new NotImplementedException();
+            Update(season);
         }
+
+        public void DeleteSeason(Season season)
+        {
+            Delete(season);
+        }
+
     }
 }

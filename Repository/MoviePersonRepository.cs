@@ -14,30 +14,32 @@ namespace Repository
         public MoviePersonRepository(DataContext dataContext) : base(dataContext)
         {
         }
-
-        public void CreateMoviePerson(MoviePerson moviePerson)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteMoviePerson(MoviePerson moviePerson)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<MoviePerson> GetAllMoviePerson()
         {
-            throw new NotImplementedException();
+            return GetAll().OrderBy(x => x.ID).ToList();
         }
 
         public MoviePerson GetMoviePersonById(int moviePersonID)
         {
-            throw new NotImplementedException();
+            return GetByCondition(x => x.ID.Equals(moviePersonID))
+            .FirstOrDefault();
+        }
+
+        public void CreateMoviePerson(MoviePerson moviePerson)
+        {
+            Create(moviePerson);
         }
 
         public void UpdateMoviePerson(MoviePerson moviePerson)
         {
-            throw new NotImplementedException();
+            Update(moviePerson);
         }
+
+        public void DeleteMoviePerson(MoviePerson moviePerson)
+        {
+            Delete(moviePerson);
+        }
+
+
     }
 }

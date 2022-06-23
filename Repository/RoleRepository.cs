@@ -14,30 +14,31 @@ namespace Repository
         public RoleRepository(DataContext dataContext) : base(dataContext)
         {
         }
-
-        public void CreateRole(Role role)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteRole(Role role)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<Role> GetAllRoles()
         {
-            throw new NotImplementedException();
+            return GetAll().OrderBy(x => x.Name).ToList();
         }
 
         public Role GetRoleById(int roleID)
         {
-            throw new NotImplementedException();
+            return GetByCondition(x => x.ID.Equals(roleID))
+            .FirstOrDefault();
+        }
+
+        public void CreateRole(Role role)
+        {
+            Create(role);
         }
 
         public void UpdateRole(Role role)
         {
-            throw new NotImplementedException();
+            Update(role);
         }
+
+        public void DeleteRole(Role role)
+        {
+            Delete(role);
+        }
+
     }
 }

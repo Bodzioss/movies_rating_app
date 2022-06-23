@@ -69,6 +69,18 @@ namespace Repository
             }
         }
 
+        public IMovieRepository Movie
+        {
+            get
+            {
+                if (_movie == null)
+                {
+                    _movie = new MovieRepository(_dataContext);
+                }
+                return _movie;
+            }
+        }
+
         public IPersonRepository Person
         {
             get

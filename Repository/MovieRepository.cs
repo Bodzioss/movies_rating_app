@@ -15,29 +15,32 @@ namespace Repository
         {
         }
 
-        public void CreateMovie(Movie movie)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteMovie(Movie movie)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<Movie> GetAllMovie()
         {
-            throw new NotImplementedException();
+            return GetAll().OrderBy(x => x.ID).ToList();
         }
 
         public Movie GetMovieById(int movieID)
         {
-            throw new NotImplementedException();
+            return GetByCondition(x => x.ID.Equals(movieID))
+            .FirstOrDefault();
+        }
+
+        public void CreateMovie(Movie movie)
+        {
+            Create(movie);
         }
 
         public void UpdateMovie(Movie movie)
         {
-            throw new NotImplementedException();
+            Update(movie);
         }
+
+        public void DeleteMovie(Movie movie)
+        {
+            Delete(movie);
+        }
+
+
     }
 }

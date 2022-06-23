@@ -15,30 +15,32 @@ namespace Repository
         public PersonRepository(DataContext dataContext) : base(dataContext)
         {
         }
-
-        public void CreatePerson(Person person)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeletePerson(Person person)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<Person> GetAllPeople()
         {
-            throw new NotImplementedException();
+            return GetAll().OrderBy(x => x.LastName).OrderBy(x => x.FirstName).ToList();
         }
 
         public Person GetPersonById(int personID)
         {
-            throw new NotImplementedException();
+            return GetByCondition(x => x.ID.Equals(personID))
+            .FirstOrDefault();
+        }
+
+        public void CreatePerson(Person person)
+        {
+            Create(person);
         }
 
         public void UpdatePerson(Person person)
         {
-            throw new NotImplementedException();
+            Update(person);
         }
+
+        public void DeletePerson(Person person)
+        {
+            Delete(person);
+        }
+
+
     }
 }

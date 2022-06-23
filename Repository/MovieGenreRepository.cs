@@ -15,29 +15,31 @@ namespace Repository
         {
         }
 
-        public void CreateMovieGenre(MovieGenre movieGenre)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteMovieGenre(MovieGenre movieGenre)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<MovieGenre> GetAllMovieGenres()
         {
-            throw new NotImplementedException();
+            return GetAll().OrderBy(x => x.ID).ToList();
         }
 
         public MovieGenre GetMovieGenreById(int movieGenreID)
         {
-            throw new NotImplementedException();
+            return GetByCondition(x => x.ID.Equals(movieGenreID))
+            .FirstOrDefault();
         }
 
+        public void CreateMovieGenre(MovieGenre movieGenre)
+        {
+            Create(movieGenre);
+        }
         public void UpdateMovieGenre(MovieGenre movieGenre)
         {
-            throw new NotImplementedException();
+            Update(movieGenre);
         }
+
+        public void DeleteMovieGenre(MovieGenre movieGenre)
+        {
+            Delete(movieGenre);
+        }
+
+
     }
 }
