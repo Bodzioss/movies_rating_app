@@ -9,5 +9,10 @@ namespace Contracts
 {
     public interface IPersonRepository : IRepositoryBase<Person>
     {
+        IEnumerable<Person> GetAllPeople();
+        Person GetPersonById(int personID);
+        void CreatePerson(Person person);
+        void UpdatePerson(Person person);
+        void DeletePerson(Person person);
     }
 }

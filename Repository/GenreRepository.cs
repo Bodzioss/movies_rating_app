@@ -14,5 +14,30 @@ namespace Repository
         public GenreRepository(DataContext dataContext) : base(dataContext)
         {
         }
+
+        public IEnumerable<Genre> GetAllGenres()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Genre GetGenreById(int genreID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CreateGenre(Genre genre)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateGenre(Genre genre)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteGenre(Genre genre)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

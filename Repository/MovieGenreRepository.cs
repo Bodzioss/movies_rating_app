@@ -14,5 +14,30 @@ namespace Repository
         public MovieGenreRepository(DataContext dataContext) : base(dataContext)
         {
         }
+
+        public void CreateMovieGenre(MovieGenre movieGenre)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteMovieGenre(MovieGenre movieGenre)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<MovieGenre> GetAllMovieGenres()
+        {
+            throw new NotImplementedException();
+        }
+
+        public MovieGenre GetMovieGenreById(int movieGenreID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateMovieGenre(MovieGenre movieGenre)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
