@@ -15,18 +15,25 @@ LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nl
 
 builder.Services.ConfigureCors();
 builder.Services.ConfigureIISIntegration();
+builder.Services.ConfigureLoggerService();
+
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("MoviesRatingApp.API"));
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+
 var app = builder.Build();
+
+var logger = app.Services.GetRequiredService<ILoggerManager>();
+app.ConfigureExceptionHandler(logger);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
