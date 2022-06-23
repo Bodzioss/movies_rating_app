@@ -17,6 +17,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+
+ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder.AddConsole();
+    builder.AddDebug();
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
