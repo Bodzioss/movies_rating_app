@@ -7,6 +7,11 @@ namespace Entities.Models
     public class Episode
     {
         public int ID { get; set; }
+
+        [Required(ErrorMessage = "Episode number is required")]
+        [Range(0,100)]
+        [Display(Name = "Episode number")]
+        public int Number { get; set; }
         [Required(ErrorMessage = "Title is required")]
         [StringLength(50, ErrorMessage = "Title name cannot be longer than 50 characters.")]
         public string? Title { get; set; }
