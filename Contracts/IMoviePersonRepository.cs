@@ -9,7 +9,7 @@ namespace Contracts
 {
     public interface IMoviePersonRepository : IRepositoryBase<MoviePerson>
     {
-        IEnumerable<MoviePerson> GetAllMoviePerson();
+        IEnumerable<MoviePerson> GetAllMoviePeople();
         MoviePerson GetMoviePersonById(int moviePersonID);
         void CreateMoviePerson(MoviePerson moviePerson);
         void UpdateMoviePerson(MoviePerson moviePerson);

@@ -14,7 +14,7 @@ namespace Repository
         public MoviePersonRepository(DataContext dataContext) : base(dataContext)
         {
         }
-        public IEnumerable<MoviePerson> GetAllMoviePerson()
+        public IEnumerable<MoviePerson> GetAllMoviePeople()
         {
             return GetAll().OrderBy(x => x.ID).ToList();
         }
