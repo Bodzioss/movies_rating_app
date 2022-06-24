@@ -2,123 +2,159 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Contracts;
+using Entities;
+using Entities.DataTransferObjects.SeriesDtos;
+using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MoviesRatingApp.API.Models;
-using MoviesRatingApp.Data;
 
-namespace MoviesRatingApp.API.Controllers
+namespace SeriesRatingApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class SeriesController : ControllerBase
     {
-        private readonly DataContext _context;
-
-        public SeriesController(DataContext context)
+        private ILoggerManager _logger;
+        private IRepositoryWrapper _repository;
+        private IMapper _mapper;
+        public SeriesController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper)
         {
-            _context = context;
+            _logger = logger;
+            _repository = repository;
+            _mapper = mapper;
         }
 
         // GET: api/Series
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Series>>> GetTVSeries()
+        public IActionResult GetAllSeries()
         {
-          if (_context.TVSeries == null)
-          {
-              return NotFound();
-          }
-            return await _context.TVSeries.ToListAsync();
-        }
-
-        // GET: api/Series/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Series>> GetSeries(int id)
-        {
-          if (_context.TVSeries == null)
-          {
-              return NotFound();
-          }
-            var series = await _context.TVSeries.FindAsync(id);
-
-            if (series == null)
-            {
-                return NotFound();
-            }
-
-            return series;
-        }
-
-        // PUT: api/Series/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSeries(int id, Series series)
-        {
-            if (id != series.ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(series).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var series = _repository.Series.GetAllSeries();
+
+                _logger.LogInfo($"Returned all series from database.");
+
+                var seriesResult = _mapper.Map<IEnumerable<SeriesDto>>(series);
+
+                return Ok(seriesResult);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!SeriesExists(id))
+                _logger.LogError($"Something went wrong inside GetSeries action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetSeriesById(int id)
+        {
+            try
+            {
+                var series = _repository.Series.GetSeriesById(id);
+                if (series is null)
                 {
+                    _logger.LogError($"Series with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 else
                 {
-                    throw;
+                    _logger.LogInfo($"Returned series with id: {id}");
+                    var seriesResult = _mapper.Map<SeriesDto>(series);
+                    return Ok(seriesResult);
                 }
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetSeriesById action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // POST: api/Series
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Series>> PostSeries(Series series)
+        public IActionResult CreateSeries([FromBody] SeriesForCreationDto series)
         {
-          if (_context.TVSeries == null)
-          {
-              return Problem("Entity set 'DataContext.TVSeries'  is null.");
-          }
-            _context.TVSeries.Add(series);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetSeries", new { id = series.ID }, series);
+            try
+            {
+                if (series is null)
+                {
+                    _logger.LogError("Series object sent from client is null.");
+                    return BadRequest("Series object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid series object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var seriesEntity = _mapper.Map<Series>(series);
+                _repository.Series.CreateSeries(seriesEntity);
+                _repository.Save();
+                var createdSeries = _mapper.Map<SeriesDto>(seriesEntity);
+                return CreatedAtRoute("SeriesById", new { id = createdSeries.ID }, createdSeries);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside CreateSeries action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // DELETE: api/Series/5
+        [HttpPut("{id}")]
+        public IActionResult UpdateSeries(int id, [FromBody] SeriesForUpdateDto series)
+        {
+            try
+            {
+                if (series is null)
+                {
+                    _logger.LogError("Series object sent from client is null.");
+                    return BadRequest("Series object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid series object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var seriesEntity = _repository.Series.GetSeriesById(id);
+                if (seriesEntity is null)
+                {
+                    _logger.LogError($"Series with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _mapper.Map(series, seriesEntity);
+                _repository.Series.UpdateSeries(seriesEntity);
+                _repository.Save();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside UpdateSeries action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSeries(int id)
+        public IActionResult DeleteSeries(int id)
         {
-            if (_context.TVSeries == null)
+            try
             {
-                return NotFound();
+                var series = _repository.Series.GetSeriesById(id);
+                if (series == null)
+                {
+                    _logger.LogError($"Series with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _repository.Series.DeleteSeries(series);
+                _repository.Save();
+                return NoContent();
             }
-            var series = await _context.TVSeries.FindAsync(id);
-            if (series == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError($"Something went wrong inside DeleteSeries action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
             }
-
-            _context.TVSeries.Remove(series);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool SeriesExists(int id)
-        {
-            return (_context.TVSeries?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

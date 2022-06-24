@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Contracts;
+using Entities;
+using Entities.DataTransferObjects.MoviePersonDtos;
+using Entities.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MoviesRatingApp.API.Models;
 
 namespace MoviesRatingApp.API.Controllers
 {
@@ -8,108 +12,144 @@ namespace MoviesRatingApp.API.Controllers
     [ApiController]
     public class MoviePeopleController : ControllerBase
     {
-        private readonly DataContext _context;
-
-        public MoviePeopleController(DataContext context)
+        private ILoggerManager _logger;
+        private IRepositoryWrapper _repository;
+        private IMapper _mapper;
+        public MoviePeopleController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper)
         {
-            _context = context;
+            _logger = logger;
+            _repository = repository;
+            _mapper = mapper;
         }
 
+        // GET: api/MoviePeople
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MoviePerson>>> GetMoviePeople()
+        public IActionResult GetAllMoviePeople()
         {
-            if(_context.MoviePeople == null)
-            {
-                return NotFound();
-            }
-            return await _context.MoviePeople.ToListAsync();
-        }
-
-        [HttpGet("id")]
-        public async Task<ActionResult<MoviePerson>> GetMoviePeople(int id)
-        {
-            if (_context.MoviePeople == null)
-            {
-                return NotFound();
-            }
-            var moviePeople = await _context.MoviePeople.FindAsync(id);
-            if(moviePeople == null)
-            {
-                return NotFound();
-            }
-
-            return moviePeople;
-        }
-
-        [HttpPut("id")]
-        public async Task<ActionResult<MoviePerson>> PutMoviePeople(int id, MoviePerson moviePerson)
-        {
-            if (id == moviePerson.ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(moviePerson).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var moviePeople = _repository.MoviePerson.GetAllMoviePeople();
+
+                _logger.LogInfo($"Returned all moviePeople from database.");
+
+                var moviePeopleResult = _mapper.Map<IEnumerable<MoviePersonDto>>(moviePeople);
+
+                return Ok(moviePeopleResult);
             }
-            catch(DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if(!MoviePersonExist(id))
+                _logger.LogError($"Something went wrong inside GetMoviePeople action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetMoviePersonById(int id)
+        {
+            try
+            {
+                var moviePerson = _repository.MoviePerson.GetMoviePersonById(id);
+                if (moviePerson is null)
                 {
+                    _logger.LogError($"MoviePerson with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 else
                 {
-                    throw;
+                    _logger.LogInfo($"Returned moviePerson with id: {id}");
+                    var moviePersonResult = _mapper.Map<MoviePersonDto>(moviePerson);
+                    return Ok(moviePersonResult);
                 }
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetMoviePersonById action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<MoviePerson>> PostMoviePeople(MoviePerson moviePerson)
+        public IActionResult CreateMoviePerson([FromBody] MoviePersonForCreationDto moviePerson)
         {
-            if(_context.MoviePeople == null)
+            try
             {
-                return NotFound();
+                if (moviePerson is null)
+                {
+                    _logger.LogError("MoviePerson object sent from client is null.");
+                    return BadRequest("MoviePerson object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid moviePerson object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var moviePersonEntity = _mapper.Map<MoviePerson>(moviePerson);
+                _repository.MoviePerson.CreateMoviePerson(moviePersonEntity);
+                _repository.Save();
+                var createdMoviePerson = _mapper.Map<MoviePersonDto>(moviePersonEntity);
+                return CreatedAtRoute("MoviePersonById", new { id = createdMoviePerson.ID }, createdMoviePerson);
             }
-
-            _context.MoviePeople.Add(moviePerson);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetMoviePeople", new { id = moviePerson.ID }, moviePerson);
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside CreateMoviePerson action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        [HttpDelete("id")]
-        public async Task<ActionResult<MoviePerson>> DeleteMoviePeople(int id)
+        [HttpPut("{id}")]
+        public IActionResult UpdateMoviePerson(int id, [FromBody] MoviePersonForUpdateDto moviePerson)
         {
-            if(_context.MoviePeople == null)
+            try
             {
-                return NotFound();
+                if (moviePerson is null)
+                {
+                    _logger.LogError("MoviePerson object sent from client is null.");
+                    return BadRequest("MoviePerson object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid moviePerson object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var moviePersonEntity = _repository.MoviePerson.GetMoviePersonById(id);
+                if (moviePersonEntity is null)
+                {
+                    _logger.LogError($"MoviePerson with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _mapper.Map(moviePerson, moviePersonEntity);
+                _repository.MoviePerson.UpdateMoviePerson(moviePersonEntity);
+                _repository.Save();
+                return NoContent();
             }
-
-            var moviePerson = await _context.MoviePeople.FindAsync(id);
-
-            if(moviePerson == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError($"Something went wrong inside UpdateMoviePerson action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
             }
-
-            _context.MoviePeople.Remove(moviePerson);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
-
-        private bool MoviePersonExist(int id)
+        [HttpDelete("{id}")]
+        public IActionResult DeleteMoviePerson(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var moviePerson = _repository.MoviePerson.GetMoviePersonById(id);
+                if (moviePerson == null)
+                {
+                    _logger.LogError($"MoviePerson with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _repository.MoviePerson.DeleteMoviePerson(moviePerson);
+                _repository.Save();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside DeleteMoviePerson action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
-
     }
 }

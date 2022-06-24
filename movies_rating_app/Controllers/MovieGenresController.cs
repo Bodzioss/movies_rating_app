@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Contracts;
+using Entities;
+using Entities.DataTransferObjects.MovieGenreDtos;
+using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MoviesRatingApp.API.Models;
-using MoviesRatingApp.Data;
 
 namespace MoviesRatingApp.API.Controllers
 {
@@ -14,111 +17,144 @@ namespace MoviesRatingApp.API.Controllers
     [ApiController]
     public class MovieGenresController : ControllerBase
     {
-        private readonly DataContext _context;
-
-        public MovieGenresController(DataContext context)
+        private ILoggerManager _logger;
+        private IRepositoryWrapper _repository;
+        private IMapper _mapper;
+        public MovieGenresController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper)
         {
-            _context = context;
+            _logger = logger;
+            _repository = repository;
+            _mapper = mapper;
         }
 
         // GET: api/MovieGenres
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MovieGenre>>> GetMovieGenres()
+        public IActionResult GetAllMovieGenres()
         {
-          if (_context.MovieGenres == null)
-          {
-              return NotFound();
-          }
-            return await _context.MovieGenres.ToListAsync();
-        }
-
-        // GET: api/MovieGenres/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<MovieGenre>> GetMovieGenre(int id)
-        {
-          if (_context.MovieGenres == null)
-          {
-              return NotFound();
-          }
-            var movieGenre = await _context.MovieGenres.FindAsync(id);
-
-            if (movieGenre == null)
-            {
-                return NotFound();
-            }
-
-            return movieGenre;
-        }
-
-        // PUT: api/MovieGenres/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutMovieGenre(int id, MovieGenre movieGenre)
-        {
-            if (id != movieGenre.ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(movieGenre).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var movieGenres = _repository.MovieGenre.GetAllMovieGenres();
+
+                _logger.LogInfo($"Returned all movieGenres from database.");
+
+                var movieGenresResult = _mapper.Map<IEnumerable<MovieGenreDto>>(movieGenres);
+
+                return Ok(movieGenresResult);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!MovieGenreExists(id))
+                _logger.LogError($"Something went wrong inside GetMovieGenres action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetMovieGenreById(int id)
+        {
+            try
+            {
+                var movieGenre = _repository.MovieGenre.GetMovieGenreById(id);
+                if (movieGenre is null)
                 {
+                    _logger.LogError($"MovieGenre with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 else
                 {
-                    throw;
+                    _logger.LogInfo($"Returned movieGenre with id: {id}");
+                    var movieGenreResult = _mapper.Map<MovieGenreDto>(movieGenre);
+                    return Ok(movieGenreResult);
                 }
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetMovieGenreById action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // POST: api/MovieGenres
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<MovieGenre>> PostMovieGenre(MovieGenre movieGenre)
+        public IActionResult CreateMovieGenre([FromBody] MovieGenreForCreationDto movieGenre)
         {
-          if (_context.MovieGenres == null)
-          {
-              return Problem("Entity set 'DataContext.MovieGenres'  is null.");
-          }
-            _context.MovieGenres.Add(movieGenre);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetMovieGenre", new { id = movieGenre.ID }, movieGenre);
+            try
+            {
+                if (movieGenre is null)
+                {
+                    _logger.LogError("MovieGenre object sent from client is null.");
+                    return BadRequest("MovieGenre object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid movieGenre object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var movieGenreEntity = _mapper.Map<MovieGenre>(movieGenre);
+                _repository.MovieGenre.CreateMovieGenre(movieGenreEntity);
+                _repository.Save();
+                var createdMovieGenre = _mapper.Map<MovieGenreDto>(movieGenreEntity);
+                return CreatedAtRoute("MovieGenreById", new { id = createdMovieGenre.ID }, createdMovieGenre);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside CreateMovieGenre action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // DELETE: api/MovieGenres/5
+        [HttpPut("{id}")]
+        public IActionResult UpdateMovieGenre(int id, [FromBody] MovieGenreForUpdateDto movieGenre)
+        {
+            try
+            {
+                if (movieGenre is null)
+                {
+                    _logger.LogError("MovieGenre object sent from client is null.");
+                    return BadRequest("MovieGenre object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid movieGenre object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var movieGenreEntity = _repository.MovieGenre.GetMovieGenreById(id);
+                if (movieGenreEntity is null)
+                {
+                    _logger.LogError($"MovieGenre with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _mapper.Map(movieGenre, movieGenreEntity);
+                _repository.MovieGenre.UpdateMovieGenre(movieGenreEntity);
+                _repository.Save();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside UpdateMovieGenre action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMovieGenre(int id)
+        public IActionResult DeleteMovieGenre(int id)
         {
-            if (_context.MovieGenres == null)
+            try
             {
-                return NotFound();
+                var movieGenre = _repository.MovieGenre.GetMovieGenreById(id);
+                if (movieGenre == null)
+                {
+                    _logger.LogError($"MovieGenre with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _repository.MovieGenre.DeleteMovieGenre(movieGenre);
+                _repository.Save();
+                return NoContent();
             }
-            var movieGenre = await _context.MovieGenres.FindAsync(id);
-            if (movieGenre == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError($"Something went wrong inside DeleteMovieGenre action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
             }
-
-            _context.MovieGenres.Remove(movieGenre);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool MovieGenreExists(int id)
-        {
-            return (_context.MovieGenres?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

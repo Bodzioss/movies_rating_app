@@ -2,123 +2,159 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Contracts;
+using Entities;
+using Entities.DataTransferObjects.PersonDtos;
+using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MoviesRatingApp.API.Models;
-using MoviesRatingApp.Data;
 
-namespace MoviesRatingApp.API.Controllers
+namespace PeopleRatingApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class PeopleController : ControllerBase
     {
-        private readonly DataContext _context;
-
-        public PeopleController(DataContext context)
+        private ILoggerManager _logger;
+        private IRepositoryWrapper _repository;
+        private IMapper _mapper;
+        public PeopleController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper)
         {
-            _context = context;
+            _logger = logger;
+            _repository = repository;
+            _mapper = mapper;
         }
 
         // GET: api/People
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Person>>> GetPeople()
+        public IActionResult GetAllPeople()
         {
-          if (_context.People == null)
-          {
-              return NotFound();
-          }
-            return await _context.People.ToListAsync();
-        }
-
-        // GET: api/People/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Person>> GetPerson(int id)
-        {
-          if (_context.People == null)
-          {
-              return NotFound();
-          }
-            var person = await _context.People.FindAsync(id);
-
-            if (person == null)
-            {
-                return NotFound();
-            }
-
-            return person;
-        }
-
-        // PUT: api/People/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPerson(int id, Person person)
-        {
-            if (id != person.ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(person).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var persons = _repository.Person.GetAllPeople();
+
+                _logger.LogInfo($"Returned all persons from database.");
+
+                var personsResult = _mapper.Map<IEnumerable<PersonDto>>(persons);
+
+                return Ok(personsResult);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!PersonExists(id))
+                _logger.LogError($"Something went wrong inside GetPeople action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetPersonById(int id)
+        {
+            try
+            {
+                var person = _repository.Person.GetPersonById(id);
+                if (person is null)
                 {
+                    _logger.LogError($"Person with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 else
                 {
-                    throw;
+                    _logger.LogInfo($"Returned person with id: {id}");
+                    var personResult = _mapper.Map<PersonDto>(person);
+                    return Ok(personResult);
                 }
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetPersonById action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // POST: api/People
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Person>> PostPerson(Person person)
+        public IActionResult CreatePerson([FromBody] PersonForCreationDto person)
         {
-          if (_context.People == null)
-          {
-              return Problem("Entity set 'DataContext.People'  is null.");
-          }
-            _context.People.Add(person);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetPerson", new { id = person.ID }, person);
+            try
+            {
+                if (person is null)
+                {
+                    _logger.LogError("Person object sent from client is null.");
+                    return BadRequest("Person object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid person object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var personEntity = _mapper.Map<Person>(person);
+                _repository.Person.CreatePerson(personEntity);
+                _repository.Save();
+                var createdPerson = _mapper.Map<PersonDto>(personEntity);
+                return CreatedAtRoute("PersonById", new { id = createdPerson.ID }, createdPerson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside CreatePerson action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // DELETE: api/People/5
+        [HttpPut("{id}")]
+        public IActionResult UpdatePerson(int id, [FromBody] PersonForUpdateDto person)
+        {
+            try
+            {
+                if (person is null)
+                {
+                    _logger.LogError("Person object sent from client is null.");
+                    return BadRequest("Person object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid person object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var personEntity = _repository.Person.GetPersonById(id);
+                if (personEntity is null)
+                {
+                    _logger.LogError($"Person with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _mapper.Map(person, personEntity);
+                _repository.Person.UpdatePerson(personEntity);
+                _repository.Save();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside UpdatePerson action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePerson(int id)
+        public IActionResult DeletePerson(int id)
         {
-            if (_context.People == null)
+            try
             {
-                return NotFound();
+                var person = _repository.Person.GetPersonById(id);
+                if (person == null)
+                {
+                    _logger.LogError($"Person with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _repository.Person.DeletePerson(person);
+                _repository.Save();
+                return NoContent();
             }
-            var person = await _context.People.FindAsync(id);
-            if (person == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError($"Something went wrong inside DeletePerson action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
             }
-
-            _context.People.Remove(person);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool PersonExists(int id)
-        {
-            return (_context.People?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
