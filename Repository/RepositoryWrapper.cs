@@ -133,9 +133,9 @@ namespace Repository
             _dataContext = dataContext;
         }
 
-        public void Save()
+        public async Task SaveAsync()
         {
-            _dataContext.SaveChanges();
+            await _dataContext.SaveChangesAsync();
         }
     }
 }

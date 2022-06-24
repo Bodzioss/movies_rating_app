@@ -29,11 +29,11 @@ namespace RolesRatingApp.API.Controllers
 
         // GET: api/Roles
         [HttpGet]
-        public IActionResult GetAllRoles()
+        public async Task<IActionResult> GetAllRoles()
         {
             try
             {
-                var roles = _repository.Role.GetAllRoles();
+                var roles = await _repository.Role.GetAllRolesAsync();
 
                 _logger.LogInfo($"Returned all roles from database.");
 
@@ -50,11 +50,11 @@ namespace RolesRatingApp.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetRoleById(int id)
+        public async Task<IActionResult> GetRoleById(int id)
         {
             try
             {
-                var role = _repository.Role.GetRoleById(id);
+                var role = await _repository.Role.GetRoleByIdAsync(id);
                 if (role is null)
                 {
                     _logger.LogError($"Role with id: {id}, hasn't been found in db.");
@@ -75,7 +75,7 @@ namespace RolesRatingApp.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateRole([FromBody] RoleForCreationDto role)
+        public async Task<IActionResult> CreateRole([FromBody] RoleForCreationDto role)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace RolesRatingApp.API.Controllers
                 }
                 var roleEntity = _mapper.Map<Role>(role);
                 _repository.Role.CreateRole(roleEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 var createdRole = _mapper.Map<RoleDto>(roleEntity);
                 return CreatedAtRoute("RoleById", new { id = createdRole.ID }, createdRole);
             }
@@ -103,7 +103,7 @@ namespace RolesRatingApp.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateRole(int id, [FromBody] RoleForUpdateDto role)
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] RoleForUpdateDto role)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace RolesRatingApp.API.Controllers
                     _logger.LogError("Invalid role object sent from client.");
                     return BadRequest("Invalid model object");
                 }
-                var roleEntity = _repository.Role.GetRoleById(id);
+                var roleEntity = await _repository.Role.GetRoleByIdAsync(id);
                 if (roleEntity is null)
                 {
                     _logger.LogError($"Role with id: {id}, hasn't been found in db.");
@@ -125,7 +125,7 @@ namespace RolesRatingApp.API.Controllers
                 }
                 _mapper.Map(role, roleEntity);
                 _repository.Role.UpdateRole(roleEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)
@@ -136,18 +136,18 @@ namespace RolesRatingApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteRole(int id)
+        public async Task<IActionResult> DeleteRole(int id)
         {
             try
             {
-                var role = _repository.Role.GetRoleById(id);
+                var role = await _repository.Role.GetRoleByIdAsync(id);
                 if (role == null)
                 {
                     _logger.LogError($"Role with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 _repository.Role.DeleteRole(role);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)

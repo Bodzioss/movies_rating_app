@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,15 @@ namespace Repository
         {
         }
 
-        public IEnumerable<Genre> GetAllGenres()
+        public async Task<IEnumerable<Genre>> GetAllGenresAsync()
         {
-            return GetAll().OrderBy(x => x.Name).ToList();
+            return await GetAll().OrderBy(x => x.Name)
+                                 .ToListAsync();
         }
 
-        public Genre GetGenreById(int genreID)
+        public async Task<Genre> GetGenreByIdAsync(int genreID)
         {
-            return GetByCondition(x => x.ID.Equals(genreID))
-            .FirstOrDefault();
+            return await GetByCondition(x => x.ID.Equals(genreID)).FirstOrDefaultAsync();
         }
 
         public void CreateGenre(Genre genre)

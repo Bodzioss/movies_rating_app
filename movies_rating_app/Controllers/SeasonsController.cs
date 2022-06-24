@@ -29,11 +29,11 @@ namespace SeasonsRatingApp.API.Controllers
 
         // GET: api/Seasons
         [HttpGet]
-        public IActionResult GetAllSeasons()
+        public async Task<IActionResult> GetAllSeasons()
         {
             try
             {
-                var seasons = _repository.Season.GetAllSeasons();
+                var seasons = await _repository.Season.GetAllSeasonsAsync();
 
                 _logger.LogInfo($"Returned all seasons from database.");
 
@@ -50,11 +50,11 @@ namespace SeasonsRatingApp.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetSeasonById(int id)
+        public async Task<IActionResult> GetSeasonById(int id)
         {
             try
             {
-                var season = _repository.Season.GetSeasonById(id);
+                var season = await _repository.Season.GetSeasonByIdAsync(id);
                 if (season is null)
                 {
                     _logger.LogError($"Season with id: {id}, hasn't been found in db.");
@@ -75,7 +75,7 @@ namespace SeasonsRatingApp.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateSeason([FromBody] SeasonForCreationDto season)
+        public async Task<IActionResult> CreateSeason([FromBody] SeasonForCreationDto season)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace SeasonsRatingApp.API.Controllers
                 }
                 var seasonEntity = _mapper.Map<Season>(season);
                 _repository.Season.CreateSeason(seasonEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 var createdSeason = _mapper.Map<SeasonDto>(seasonEntity);
                 return CreatedAtRoute("SeasonById", new { id = createdSeason.ID }, createdSeason);
             }
@@ -103,7 +103,7 @@ namespace SeasonsRatingApp.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateSeason(int id, [FromBody] SeasonForUpdateDto season)
+        public async Task<IActionResult> UpdateSeason(int id, [FromBody] SeasonForUpdateDto season)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace SeasonsRatingApp.API.Controllers
                     _logger.LogError("Invalid season object sent from client.");
                     return BadRequest("Invalid model object");
                 }
-                var seasonEntity = _repository.Season.GetSeasonById(id);
+                var seasonEntity = await _repository.Season.GetSeasonByIdAsync(id);
                 if (seasonEntity is null)
                 {
                     _logger.LogError($"Season with id: {id}, hasn't been found in db.");
@@ -125,7 +125,7 @@ namespace SeasonsRatingApp.API.Controllers
                 }
                 _mapper.Map(season, seasonEntity);
                 _repository.Season.UpdateSeason(seasonEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)
@@ -136,18 +136,18 @@ namespace SeasonsRatingApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteSeason(int id)
+        public async Task<IActionResult> DeleteSeason(int id)
         {
             try
             {
-                var season = _repository.Season.GetSeasonById(id);
+                var season = await _repository.Season.GetSeasonByIdAsync(id);
                 if (season == null)
                 {
                     _logger.LogError($"Season with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 _repository.Season.DeleteSeason(season);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)

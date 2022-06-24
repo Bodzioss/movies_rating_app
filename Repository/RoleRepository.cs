@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,15 +15,15 @@ namespace Repository
         public RoleRepository(DataContext dataContext) : base(dataContext)
         {
         }
-        public IEnumerable<Role> GetAllRoles()
+        public async Task<IEnumerable<Role>> GetAllRolesAsync()
         {
-            return GetAll().OrderBy(x => x.Name).ToList();
+            return await GetAll().OrderBy(x => x.Name)
+                                 .ToListAsync();
         }
 
-        public Role GetRoleById(int roleID)
+        public async Task<Role> GetRoleByIdAsync(int roleID)
         {
-            return GetByCondition(x => x.ID.Equals(roleID))
-            .FirstOrDefault();
+            return await GetByCondition(x => x.ID.Equals(roleID)).FirstOrDefaultAsync();
         }
 
         public void CreateRole(Role role)

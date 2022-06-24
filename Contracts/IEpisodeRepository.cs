@@ -9,8 +9,8 @@ namespace Contracts
 {
     public interface IEpisodeRepository : IRepositoryBase<Episode>
     {
-        IEnumerable<Episode> GetAllEpisodes();
-        Episode GetEpisodeById(int episodeID);
+        Task<IEnumerable<Episode>> GetAllEpisodesAsync();
+        Task<Episode> GetEpisodeByIdAsync(int episodeID);
         void CreateEpisode(Episode episode);
         void UpdateEpisode(Episode episode);
         void DeleteEpisode(Episode episode);

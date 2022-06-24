@@ -29,11 +29,11 @@ namespace MoviesRatingApp.API.Controllers
 
         // GET: api/MovieGenres
         [HttpGet]
-        public IActionResult GetAllMovieGenres()
+        public async Task<IActionResult> GetAllMovieGenres()
         {
             try
             {
-                var movieGenres = _repository.MovieGenre.GetAllMovieGenres();
+                var movieGenres = await _repository.MovieGenre.GetAllMovieGenresAsync();
 
                 _logger.LogInfo($"Returned all movieGenres from database.");
 
@@ -50,11 +50,11 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetMovieGenreById(int id)
+        public async Task<IActionResult> GetMovieGenreById(int id)
         {
             try
             {
-                var movieGenre = _repository.MovieGenre.GetMovieGenreById(id);
+                var movieGenre = await _repository.MovieGenre.GetMovieGenreByIdAsync(id);
                 if (movieGenre is null)
                 {
                     _logger.LogError($"MovieGenre with id: {id}, hasn't been found in db.");
@@ -75,7 +75,7 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateMovieGenre([FromBody] MovieGenreForCreationDto movieGenre)
+        public async Task<IActionResult> CreateMovieGenre([FromBody] MovieGenreForCreationDto movieGenre)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace MoviesRatingApp.API.Controllers
                 }
                 var movieGenreEntity = _mapper.Map<MovieGenre>(movieGenre);
                 _repository.MovieGenre.CreateMovieGenre(movieGenreEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 var createdMovieGenre = _mapper.Map<MovieGenreDto>(movieGenreEntity);
                 return CreatedAtRoute("MovieGenreById", new { id = createdMovieGenre.ID }, createdMovieGenre);
             }
@@ -103,7 +103,7 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateMovieGenre(int id, [FromBody] MovieGenreForUpdateDto movieGenre)
+        public async Task<IActionResult> UpdateMovieGenre(int id, [FromBody] MovieGenreForUpdateDto movieGenre)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace MoviesRatingApp.API.Controllers
                     _logger.LogError("Invalid movieGenre object sent from client.");
                     return BadRequest("Invalid model object");
                 }
-                var movieGenreEntity = _repository.MovieGenre.GetMovieGenreById(id);
+                var movieGenreEntity = await _repository.MovieGenre.GetMovieGenreByIdAsync(id);
                 if (movieGenreEntity is null)
                 {
                     _logger.LogError($"MovieGenre with id: {id}, hasn't been found in db.");
@@ -125,7 +125,7 @@ namespace MoviesRatingApp.API.Controllers
                 }
                 _mapper.Map(movieGenre, movieGenreEntity);
                 _repository.MovieGenre.UpdateMovieGenre(movieGenreEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)
@@ -136,18 +136,18 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteMovieGenre(int id)
+        public async Task<IActionResult> DeleteMovieGenre(int id)
         {
             try
             {
-                var movieGenre = _repository.MovieGenre.GetMovieGenreById(id);
+                var movieGenre = await _repository.MovieGenre.GetMovieGenreByIdAsync(id);
                 if (movieGenre == null)
                 {
                     _logger.LogError($"MovieGenre with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 _repository.MovieGenre.DeleteMovieGenre(movieGenre);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)

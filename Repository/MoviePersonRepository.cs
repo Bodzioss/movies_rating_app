@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,15 +15,15 @@ namespace Repository
         public MoviePersonRepository(DataContext dataContext) : base(dataContext)
         {
         }
-        public IEnumerable<MoviePerson> GetAllMoviePeople()
+        public async Task<IEnumerable<MoviePerson>> GetAllMoviePeopleAsync()
         {
-            return GetAll().OrderBy(x => x.ID).ToList();
+            return await GetAll().OrderBy(x => x.ID)
+                                 .ToListAsync();
         }
 
-        public MoviePerson GetMoviePersonById(int moviePersonID)
+        public async Task<MoviePerson> GetMoviePersonByIdAsync(int moviePersonID)
         {
-            return GetByCondition(x => x.ID.Equals(moviePersonID))
-            .FirstOrDefault();
+            return await GetByCondition(x => x.ID.Equals(moviePersonID)).FirstOrDefaultAsync();
         }
 
         public void CreateMoviePerson(MoviePerson moviePerson)
