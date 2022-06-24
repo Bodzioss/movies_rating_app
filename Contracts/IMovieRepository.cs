@@ -9,7 +9,7 @@ namespace Contracts
 {
     public interface IMovieRepository : IRepositoryBase<Movie>
     {
-        IEnumerable<Movie> GetAllMovie();
+        IEnumerable<Movie> GetAllMovies();
         Movie GetMovieById(int movieID);
         void CreateMovie(Movie movie);
         void UpdateMovie(Movie movie);

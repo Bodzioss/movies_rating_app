@@ -15,7 +15,7 @@ namespace Repository
         {
         }
 
-        public IEnumerable<Movie> GetAllMovie()
+        public IEnumerable<Movie> GetAllMovies()
         {
             return GetAll().OrderBy(x => x.ID).ToList();
         }

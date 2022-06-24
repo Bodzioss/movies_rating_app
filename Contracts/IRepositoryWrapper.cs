@@ -10,6 +10,7 @@ namespace Contracts
     {
         public IEpisodeRepository Episode { get; }
         public IGenreRepository Genre { get; }
+        public IMovieRepository Movie { get; }
         public IMovieGenreRepository MovieGenre { get;  }
         public IMoviePersonRepository MoviePerson { get; }
         public IPersonRepository Person { get;}

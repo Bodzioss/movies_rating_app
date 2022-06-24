@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Contracts;
 using Entities;
+using Entities.DataTransferObjects.MovieDtos;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,111 +17,144 @@ namespace MoviesRatingApp.API.Controllers
     [ApiController]
     public class MoviesController : ControllerBase
     {
-        private readonly DataContext _context;
-
-        public MoviesController(DataContext context)
+        private ILoggerManager _logger;
+        private IRepositoryWrapper _repository;
+        private IMapper _mapper;
+        public MoviesController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper)
         {
-            _context = context;
+            _logger = logger;
+            _repository = repository;
+            _mapper = mapper;
         }
 
         // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetMovies()
+        public IActionResult GetAllMovies()
         {
-          if (_context.Movies == null)
-          {
-              return NotFound();
-          }
-            return await _context.Movies.ToListAsync();
-        }
-
-        // GET: api/Movies/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Movie>> GetMovie(int id)
-        {
-          if (_context.Movies == null)
-          {
-              return NotFound();
-          }
-            var movie = await _context.Movies.FindAsync(id);
-
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            return movie;
-        }
-
-        // PUT: api/Movies/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutMovie(int id, Movie movie)
-        {
-            if (id != movie.ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(movie).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var movies = _repository.Movie.GetAllMovies();
+
+                _logger.LogInfo($"Returned all movies from database.");
+
+                var moviesResult = _mapper.Map<IEnumerable<MovieDto>>(movies);
+
+                return Ok(moviesResult);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!MovieExists(id))
+                _logger.LogError($"Something went wrong inside GetMovies action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetMovieById(int id)
+        {
+            try
+            {
+                var movie = _repository.Movie.GetMovieById(id);
+                if (movie is null)
                 {
+                    _logger.LogError($"Movie with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 else
                 {
-                    throw;
+                    _logger.LogInfo($"Returned movie with id: {id}");
+                    var movieResult = _mapper.Map<MovieDto>(movie);
+                    return Ok(movieResult);
                 }
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetMovieById action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // POST: api/Movies
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Movie>> PostMovie(Movie movie)
+        public IActionResult CreateMovie([FromBody] MovieForCreationDto movie)
         {
-          if (_context.Movies == null)
-          {
-              return Problem("Entity set 'DataContext.Movies'  is null.");
-          }
-            _context.Movies.Add(movie);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetMovie", new { id = movie.ID }, movie);
+            try
+            {
+                if (movie is null)
+                {
+                    _logger.LogError("Movie object sent from client is null.");
+                    return BadRequest("Movie object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid movie object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var movieEntity = _mapper.Map<Movie>(movie);
+                _repository.Movie.CreateMovie(movieEntity);
+                _repository.Save();
+                var createdMovie = _mapper.Map<MovieDto>(movieEntity);
+                return CreatedAtRoute("MovieById", new { id = createdMovie.ID }, createdMovie);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside CreateMovie action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // DELETE: api/Movies/5
+        [HttpPut("{id}")]
+        public IActionResult UpdateMovie(int id, [FromBody] MovieForUpdateDto movie)
+        {
+            try
+            {
+                if (movie is null)
+                {
+                    _logger.LogError("Movie object sent from client is null.");
+                    return BadRequest("Movie object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid movie object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var movieEntity = _repository.Movie.GetMovieById(id);
+                if (movieEntity is null)
+                {
+                    _logger.LogError($"Movie with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _mapper.Map(movie, movieEntity);
+                _repository.Movie.UpdateMovie(movieEntity);
+                _repository.Save();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside UpdateMovie action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMovie(int id)
+        public IActionResult DeleteMovie(int id)
         {
-            if (_context.Movies == null)
+            try
             {
-                return NotFound();
+                var movie = _repository.Movie.GetMovieById(id);
+                if (movie == null)
+                {
+                    _logger.LogError($"Movie with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _repository.Movie.DeleteMovie(movie);
+                _repository.Save();
+                return NoContent();
             }
-            var movie = await _context.Movies.FindAsync(id);
-            if (movie == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError($"Something went wrong inside DeleteMovie action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
             }
-
-            _context.Movies.Remove(movie);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool MovieExists(int id)
-        {
-            return (_context.Movies?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
