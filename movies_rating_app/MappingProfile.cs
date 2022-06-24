@@ -2,6 +2,7 @@
 using Entities.Models;
 using Entities.DataTransferObjects;
 using Entities.DataTransferObjects.EpisodeDtos;
+using Entities.DataTransferObjects.GenreDtos;
 
 namespace MoviesRatingApp.API
 {
@@ -11,6 +12,9 @@ namespace MoviesRatingApp.API
         {
             CreateMap<Episode, EpisodeDto>();
             CreateMap<EpisodeForCreationDto, Episode>();
+
+            CreateMap<Genre, GenreDto>();
+            CreateMap<GenreForCreationDto, Genre>();
         }
     }
 }

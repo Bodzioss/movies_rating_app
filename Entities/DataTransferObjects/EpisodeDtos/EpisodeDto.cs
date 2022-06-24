@@ -8,7 +8,7 @@ namespace Entities.DataTransferObjects.EpisodeDtos
 {
     public class EpisodeDto
     {
-        //public int ID { get; set; }
+        public int ID { get; set; }
         public int Number { get; set; }
         public string? Title { get; set; }
         public DateTime ReleaseDate { get; set; }
