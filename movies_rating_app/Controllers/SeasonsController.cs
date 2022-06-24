@@ -15,7 +15,7 @@ namespace SeasonsRatingApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SeasonController : ControllerBase
+    public class SeasonsController : ControllerBase
     {
         private ILoggerManager _logger;
         private IRepositoryWrapper _repository;

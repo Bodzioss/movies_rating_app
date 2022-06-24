@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entities.DataTransferObjects.SeriesDtos
 {
-    internal class SeriesForUpdateDto
+    public class SeriesForUpdateDto
     {
         [Required(ErrorMessage = "Title is required")]
         [StringLength(50, ErrorMessage = "Title cannot be longer than 50 characters.")]
