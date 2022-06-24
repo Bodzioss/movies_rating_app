@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Entities.DataTransferObjects.MovieGenreDtos
 {
-    public class MovieGenreForCreationFto
+    public class MovieGenreForCreationDto
     {
         [Required(ErrorMessage = "MovieID is required")]
         public int MovieID { get; set; }
