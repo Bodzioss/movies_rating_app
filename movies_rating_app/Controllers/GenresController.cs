@@ -87,7 +87,7 @@ namespace MoviesRatingApp.API.Controllers
                 _repository.Genre.CreateGenre(genreEntity);
                 await _repository.SaveAsync();
                 var createdGenre = _mapper.Map<GenreDto>(genreEntity);
-                return CreatedAtRoute("GenreById", new { id = createdGenre.ID }, createdGenre);
+                return CreatedAtRoute("GenreByIdAsync", new { id = createdGenre.ID }, createdGenre);
             }
             catch (Exception ex)
             {

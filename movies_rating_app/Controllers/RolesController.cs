@@ -93,7 +93,7 @@ namespace RolesRatingApp.API.Controllers
                 _repository.Role.CreateRole(roleEntity);
                 await _repository.SaveAsync();
                 var createdRole = _mapper.Map<RoleDto>(roleEntity);
-                return CreatedAtRoute("RoleById", new { id = createdRole.ID }, createdRole);
+                return CreatedAtRoute("RoleByIdAsync", new { id = createdRole.ID }, createdRole);
             }
             catch (Exception ex)
             {

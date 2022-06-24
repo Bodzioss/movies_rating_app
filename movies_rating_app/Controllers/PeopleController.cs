@@ -93,7 +93,7 @@ namespace PeopleRatingApp.API.Controllers
                 _repository.Person.CreatePerson(personEntity);
                 await _repository.SaveAsync();
                 var createdPerson = _mapper.Map<PersonDto>(personEntity);
-                return CreatedAtRoute("PersonById", new { id = createdPerson.ID }, createdPerson);
+                return CreatedAtRoute("PersonByIdAsync", new { id = createdPerson.ID }, createdPerson);
             }
             catch (Exception ex)
             {

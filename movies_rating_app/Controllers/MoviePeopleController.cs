@@ -88,7 +88,7 @@ namespace MoviesRatingApp.API.Controllers
                 _repository.MoviePerson.CreateMoviePerson(moviePersonEntity);
                 await _repository.SaveAsync();
                 var createdMoviePerson = _mapper.Map<MoviePersonDto>(moviePersonEntity);
-                return CreatedAtRoute("MoviePersonById", new { id = createdMoviePerson.ID }, createdMoviePerson);
+                return CreatedAtRoute("MoviePersonByIdAsync", new { id = createdMoviePerson.ID }, createdMoviePerson);
             }
             catch (Exception ex)
             {
