@@ -2,123 +2,159 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Contracts;
 using Entities;
+using Entities.DataTransferObjects.RoleDtos;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace MoviesRatingApp.API.Controllers
+namespace RolesRatingApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class RolesController : ControllerBase
     {
-        private readonly DataContext _context;
-
-        public RolesController(DataContext context)
+        private ILoggerManager _logger;
+        private IRepositoryWrapper _repository;
+        private IMapper _mapper;
+        public RolesController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper)
         {
-            _context = context;
+            _logger = logger;
+            _repository = repository;
+            _mapper = mapper;
         }
 
         // GET: api/Roles
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Role>>> GetRoles()
+        public IActionResult GetAllRoles()
         {
-          if (_context.Roles == null)
-          {
-              return NotFound();
-          }
-            return await _context.Roles.ToListAsync();
-        }
-
-        // GET: api/Roles/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Role>> GetRole(int id)
-        {
-          if (_context.Roles == null)
-          {
-              return NotFound();
-          }
-            var role = await _context.Roles.FindAsync(id);
-
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            return role;
-        }
-
-        // PUT: api/Roles/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRole(int id, Role role)
-        {
-            if (id != role.ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(role).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var roles = _repository.Role.GetAllRoles();
+
+                _logger.LogInfo($"Returned all roles from database.");
+
+                var rolesResult = _mapper.Map<IEnumerable<RoleDto>>(roles);
+
+                return Ok(rolesResult);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!RoleExists(id))
+                _logger.LogError($"Something went wrong inside GetRoles action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetRoleById(int id)
+        {
+            try
+            {
+                var role = _repository.Role.GetRoleById(id);
+                if (role is null)
                 {
+                    _logger.LogError($"Role with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 else
                 {
-                    throw;
+                    _logger.LogInfo($"Returned role with id: {id}");
+                    var roleResult = _mapper.Map<RoleDto>(role);
+                    return Ok(roleResult);
                 }
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetRoleById action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // POST: api/Roles
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Role>> PostRole(Role role)
+        public IActionResult CreateRole([FromBody] RoleForCreationDto role)
         {
-          if (_context.Roles == null)
-          {
-              return Problem("Entity set 'DataContext.Roles'  is null.");
-          }
-            _context.Roles.Add(role);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetRole", new { id = role.ID }, role);
+            try
+            {
+                if (role is null)
+                {
+                    _logger.LogError("Role object sent from client is null.");
+                    return BadRequest("Role object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid role object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var roleEntity = _mapper.Map<Role>(role);
+                _repository.Role.CreateRole(roleEntity);
+                _repository.Save();
+                var createdRole = _mapper.Map<RoleDto>(roleEntity);
+                return CreatedAtRoute("RoleById", new { id = createdRole.ID }, createdRole);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside CreateRole action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
-        // DELETE: api/Roles/5
+        [HttpPut("{id}")]
+        public IActionResult UpdateRole(int id, [FromBody] RoleForUpdateDto role)
+        {
+            try
+            {
+                if (role is null)
+                {
+                    _logger.LogError("Role object sent from client is null.");
+                    return BadRequest("Role object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid role object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+                var roleEntity = _repository.Role.GetRoleById(id);
+                if (roleEntity is null)
+                {
+                    _logger.LogError($"Role with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _mapper.Map(role, roleEntity);
+                _repository.Role.UpdateRole(roleEntity);
+                _repository.Save();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside UpdateRole action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRole(int id)
+        public IActionResult DeleteRole(int id)
         {
-            if (_context.Roles == null)
+            try
             {
-                return NotFound();
+                var role = _repository.Role.GetRoleById(id);
+                if (role == null)
+                {
+                    _logger.LogError($"Role with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                _repository.Role.DeleteRole(role);
+                _repository.Save();
+                return NoContent();
             }
-            var role = await _context.Roles.FindAsync(id);
-            if (role == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError($"Something went wrong inside DeleteRole action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
             }
-
-            _context.Roles.Remove(role);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool RoleExists(int id)
-        {
-            return (_context.Roles?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
