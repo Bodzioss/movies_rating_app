@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,15 @@ namespace Repository
         {
         }
 
-        public IEnumerable<Series> GetAllSeries()
+        public async Task<IEnumerable<Series>> GetAllSeriesAsync()
         {
-            return GetAll().OrderBy(x => x.Title).ToList();
+            return await GetAll().OrderBy(x => x.Title)
+                                 .ToListAsync();
         }
 
-        public Series GetSeriesById(int seriesID)
+        public async Task<Series> GetSeriesByIdAsync(int seriesID)
         {
-            return GetByCondition(x => x.ID.Equals(seriesID))
-            .FirstOrDefault();
+            return await GetByCondition(x => x.ID.Equals(seriesID)).FirstOrDefaultAsync();
         }
 
         public void CreateSeries(Series series)

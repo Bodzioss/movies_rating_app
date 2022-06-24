@@ -9,8 +9,8 @@ namespace Contracts
 {
     public interface IMovieRepository : IRepositoryBase<Movie>
     {
-        IEnumerable<Movie> GetAllMovies();
-        Movie GetMovieById(int movieID);
+        Task<IEnumerable<Movie>> GetAllMoviesAsync();
+        Task<Movie> GetMovieByIdAsync(int movieID);
         void CreateMovie(Movie movie);
         void UpdateMovie(Movie movie);
         void DeleteMovie(Movie movie);

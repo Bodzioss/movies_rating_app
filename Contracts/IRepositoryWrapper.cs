@@ -17,6 +17,6 @@ namespace Contracts
         public IRoleRepository Role { get;  }
         public ISeasonRepository Season { get;  }
         public ISeriesRepository Series { get;  }
-        void Save();
+        Task SaveAsync();
     }
 }

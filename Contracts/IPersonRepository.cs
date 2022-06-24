@@ -9,8 +9,8 @@ namespace Contracts
 {
     public interface IPersonRepository : IRepositoryBase<Person>
     {
-        IEnumerable<Person> GetAllPeople();
-        Person GetPersonById(int personID);
+        Task<IEnumerable<Person>> GetAllPeopleAsync();
+        Task<Person> GetPersonByIdAsync(int personID);
         void CreatePerson(Person person);
         void UpdatePerson(Person person);
         void DeletePerson(Person person);

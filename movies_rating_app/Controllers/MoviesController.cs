@@ -29,11 +29,11 @@ namespace MoviesRatingApp.API.Controllers
 
         // GET: api/Movies
         [HttpGet]
-        public IActionResult GetAllMovies()
+        public async Task<IActionResult> GetAllMovies()
         {
             try
             {
-                var movies = _repository.Movie.GetAllMovies();
+                var movies = await _repository.Movie.GetAllMoviesAsync();
 
                 _logger.LogInfo($"Returned all movies from database.");
 
@@ -50,11 +50,11 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetMovieById(int id)
+        public async Task<IActionResult> GetMovieById(int id)
         {
             try
             {
-                var movie = _repository.Movie.GetMovieById(id);
+                var movie = await _repository.Movie.GetMovieByIdAsync(id);
                 if (movie is null)
                 {
                     _logger.LogError($"Movie with id: {id}, hasn't been found in db.");
@@ -75,7 +75,7 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateMovie([FromBody] MovieForCreationDto movie)
+        public async Task<IActionResult> CreateMovie([FromBody] MovieForCreationDto movie)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace MoviesRatingApp.API.Controllers
                 }
                 var movieEntity = _mapper.Map<Movie>(movie);
                 _repository.Movie.CreateMovie(movieEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 var createdMovie = _mapper.Map<MovieDto>(movieEntity);
                 return CreatedAtRoute("MovieById", new { id = createdMovie.ID }, createdMovie);
             }
@@ -103,7 +103,7 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateMovie(int id, [FromBody] MovieForUpdateDto movie)
+        public async Task<IActionResult> UpdateMovie(int id, [FromBody] MovieForUpdateDto movie)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace MoviesRatingApp.API.Controllers
                     _logger.LogError("Invalid movie object sent from client.");
                     return BadRequest("Invalid model object");
                 }
-                var movieEntity = _repository.Movie.GetMovieById(id);
+                var movieEntity =await _repository.Movie.GetMovieByIdAsync(id);
                 if (movieEntity is null)
                 {
                     _logger.LogError($"Movie with id: {id}, hasn't been found in db.");
@@ -125,7 +125,7 @@ namespace MoviesRatingApp.API.Controllers
                 }
                 _mapper.Map(movie, movieEntity);
                 _repository.Movie.UpdateMovie(movieEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)
@@ -136,18 +136,18 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteMovie(int id)
+        public async Task<IActionResult> DeleteMovie(int id)
         {
             try
             {
-                var movie = _repository.Movie.GetMovieById(id);
+                var movie = await _repository.Movie.GetMovieByIdAsync(id);
                 if (movie == null)
                 {
                     _logger.LogError($"Movie with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 _repository.Movie.DeleteMovie(movie);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
@@ -15,15 +16,16 @@ namespace Repository
         public PersonRepository(DataContext dataContext) : base(dataContext)
         {
         }
-        public IEnumerable<Person> GetAllPeople()
+        public async Task<IEnumerable<Person>> GetAllPeopleAsync()
         {
-            return GetAll().OrderBy(x => x.LastName).OrderBy(x => x.FirstName).ToList();
+            return await GetAll().OrderBy(x => x.LastName)
+                           .OrderBy(x => x.FirstName)
+                           .ToListAsync();
         }
 
-        public Person GetPersonById(int personID)
+        public async Task<Person> GetPersonByIdAsync(int personID)
         {
-            return GetByCondition(x => x.ID.Equals(personID))
-            .FirstOrDefault();
+            return await GetByCondition(x => x.ID.Equals(personID)).FirstOrDefaultAsync();
         }
 
         public void CreatePerson(Person person)

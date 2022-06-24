@@ -29,11 +29,11 @@ namespace SeriesRatingApp.API.Controllers
 
         // GET: api/Series
         [HttpGet]
-        public IActionResult GetAllSeries()
+        public async Task<IActionResult> GetAllSeries()
         {
             try
             {
-                var series = _repository.Series.GetAllSeries();
+                var series = await _repository.Series.GetAllSeriesAsync();
 
                 _logger.LogInfo($"Returned all series from database.");
 
@@ -50,11 +50,11 @@ namespace SeriesRatingApp.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetSeriesById(int id)
+        public async Task<IActionResult> GetSeriesById(int id)
         {
             try
             {
-                var series = _repository.Series.GetSeriesById(id);
+                var series = await _repository.Series.GetSeriesByIdAsync(id);
                 if (series is null)
                 {
                     _logger.LogError($"Series with id: {id}, hasn't been found in db.");
@@ -75,7 +75,7 @@ namespace SeriesRatingApp.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateSeries([FromBody] SeriesForCreationDto series)
+        public async Task<IActionResult> CreateSeries([FromBody] SeriesForCreationDto series)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace SeriesRatingApp.API.Controllers
                 }
                 var seriesEntity = _mapper.Map<Series>(series);
                 _repository.Series.CreateSeries(seriesEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 var createdSeries = _mapper.Map<SeriesDto>(seriesEntity);
                 return CreatedAtRoute("SeriesById", new { id = createdSeries.ID }, createdSeries);
             }
@@ -103,7 +103,7 @@ namespace SeriesRatingApp.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateSeries(int id, [FromBody] SeriesForUpdateDto series)
+        public async Task<IActionResult> UpdateSeries(int id, [FromBody] SeriesForUpdateDto series)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace SeriesRatingApp.API.Controllers
                     _logger.LogError("Invalid series object sent from client.");
                     return BadRequest("Invalid model object");
                 }
-                var seriesEntity = _repository.Series.GetSeriesById(id);
+                var seriesEntity = await _repository.Series.GetSeriesByIdAsync(id);
                 if (seriesEntity is null)
                 {
                     _logger.LogError($"Series with id: {id}, hasn't been found in db.");
@@ -125,7 +125,7 @@ namespace SeriesRatingApp.API.Controllers
                 }
                 _mapper.Map(series, seriesEntity);
                 _repository.Series.UpdateSeries(seriesEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)
@@ -136,18 +136,18 @@ namespace SeriesRatingApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteSeries(int id)
+        public async Task<IActionResult> DeleteSeries(int id)
         {
             try
             {
-                var series = _repository.Series.GetSeriesById(id);
+                var series = await _repository.Series.GetSeriesByIdAsync(id);
                 if (series == null)
                 {
                     _logger.LogError($"Series with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 _repository.Series.DeleteSeries(series);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)

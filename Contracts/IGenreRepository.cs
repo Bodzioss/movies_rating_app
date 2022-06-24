@@ -9,8 +9,8 @@ namespace Contracts
 {
     public interface IGenreRepository : IRepositoryBase<Genre>
     {
-        IEnumerable<Genre> GetAllGenres();
-        Genre GetGenreById(int genreID);
+        Task<IEnumerable<Genre>> GetAllGenresAsync();
+        Task<Genre> GetGenreByIdAsync(int genreID);
         void CreateGenre(Genre genre);
         void UpdateGenre(Genre genre);
         void DeleteGenre(Genre genre);

@@ -29,11 +29,11 @@ namespace MoviesRatingApp.API.Controllers
 
         // GET: api/Episodes
         [HttpGet]
-        public IActionResult GetAllEpisodes()
+        public async Task<IActionResult> GetAllEpisodes()
         {
             try
             {
-                var episodes = _repository.Episode.GetAllEpisodes();
+                var episodes = await _repository.Episode.GetAllEpisodesAsync();
 
                 _logger.LogInfo($"Returned all owners from database.");
 
@@ -43,18 +43,18 @@ namespace MoviesRatingApp.API.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError($"Something went wrong inside GetEpisodes action: {ex.Message}");
+                _logger.LogError($"Something went wrong inside GetEpisodesAsync action: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
 
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetEpisodeById(int id)
+        public async Task<IActionResult> GetEpisodeById(int id)
         {
             try
             {
-                var episode = _repository.Episode.GetEpisodeById(id);
+                var episode = await _repository.Episode.GetEpisodeByIdAsync(id);
                 if (episode is null)
                 {
                     _logger.LogError($"Episode with id: {id}, hasn't been found in db.");
@@ -69,13 +69,13 @@ namespace MoviesRatingApp.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Something went wrong inside GetEpisodeById action: {ex.Message}");
+                _logger.LogError($"Something went wrong inside GetEpisodeByIdAsync action: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
         }
 
         [HttpPost]
-        public IActionResult CreateEpisode([FromBody] EpisodeForCreationDto episode)
+        public async Task<IActionResult> CreateEpisode([FromBody] EpisodeForCreationDto episode)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace MoviesRatingApp.API.Controllers
                 }
                 var episodeEntity = _mapper.Map<Episode>(episode);
                 _repository.Episode.CreateEpisode(episodeEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 var createdEpisode = _mapper.Map<EpisodeDto>(episodeEntity);
                 return CreatedAtRoute("EpisodeById", new { id = createdEpisode.ID }, createdEpisode);
             }
@@ -103,7 +103,7 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateEpisode(int id, [FromBody] EpisodeForUpdateDto episode)
+        public async Task<IActionResult> UpdateEpisode(int id, [FromBody] EpisodeForUpdateDto episode)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace MoviesRatingApp.API.Controllers
                     _logger.LogError("Invalid episode object sent from client.");
                     return BadRequest("Invalid model object");
                 }
-                var episodeEntity = _repository.Episode.GetEpisodeById(id);
+                var episodeEntity = await _repository.Episode.GetEpisodeByIdAsync(id);
                 if (episodeEntity is null)
                 {
                     _logger.LogError($"Episode with id: {id}, hasn't been found in db.");
@@ -125,7 +125,7 @@ namespace MoviesRatingApp.API.Controllers
                 }
                 _mapper.Map(episode, episodeEntity);
                 _repository.Episode.UpdateEpisode(episodeEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)
@@ -136,18 +136,18 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteEpisode(int id)
+        public async Task<IActionResult> DeleteEpisode(int id)
         {
             try
             {
-                var episode = _repository.Episode.GetEpisodeById(id);
+                var episode =await _repository.Episode.GetEpisodeByIdAsync(id);
                 if (episode == null)
                 {
                     _logger.LogError($"Episode with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 _repository.Episode.DeleteEpisode(episode);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)

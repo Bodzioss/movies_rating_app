@@ -9,8 +9,8 @@ namespace Contracts
 {
     public interface IRoleRepository : IRepositoryBase<Role>
     {
-        IEnumerable<Role> GetAllRoles();
-        Role GetRoleById(int roleID);
+        Task<IEnumerable<Role>> GetAllRolesAsync();
+        Task<Role> GetRoleByIdAsync(int roleID);
         void CreateRole(Role role);
         void UpdateRole(Role role);
         void DeleteRole(Role role);

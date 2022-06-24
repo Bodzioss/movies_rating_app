@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,15 @@ namespace Repository
         {
         }
 
-        public IEnumerable<MovieGenre> GetAllMovieGenres()
+        public async Task<IEnumerable<MovieGenre>> GetAllMovieGenresAsync()
         {
-            return GetAll().OrderBy(x => x.ID).ToList();
+            return await GetAll().OrderBy(x => x.ID)
+                                 .ToListAsync();
         }
 
-        public MovieGenre GetMovieGenreById(int movieGenreID)
+        public async Task<MovieGenre> GetMovieGenreByIdAsync(int movieGenreID)
         {
-            return GetByCondition(x => x.ID.Equals(movieGenreID))
-            .FirstOrDefault();
+            return await GetByCondition(x => x.ID.Equals(movieGenreID)).FirstOrDefaultAsync();
         }
 
         public void CreateMovieGenre(MovieGenre movieGenre)

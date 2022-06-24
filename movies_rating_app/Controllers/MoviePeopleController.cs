@@ -24,11 +24,11 @@ namespace MoviesRatingApp.API.Controllers
 
         // GET: api/MoviePeople
         [HttpGet]
-        public IActionResult GetAllMoviePeople()
+        public async Task<IActionResult> GetAllMoviePeople()
         {
             try
             {
-                var moviePeople = _repository.MoviePerson.GetAllMoviePeople();
+                var moviePeople = await _repository.MoviePerson.GetAllMoviePeopleAsync();
 
                 _logger.LogInfo($"Returned all moviePeople from database.");
 
@@ -45,11 +45,11 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetMoviePersonById(int id)
+        public async Task<IActionResult> GetMoviePersonById(int id)
         {
             try
             {
-                var moviePerson = _repository.MoviePerson.GetMoviePersonById(id);
+                var moviePerson = await _repository.MoviePerson.GetMoviePersonByIdAsync(id);
                 if (moviePerson is null)
                 {
                     _logger.LogError($"MoviePerson with id: {id}, hasn't been found in db.");
@@ -70,7 +70,7 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateMoviePerson([FromBody] MoviePersonForCreationDto moviePerson)
+        public async Task<IActionResult> CreateMoviePerson([FromBody] MoviePersonForCreationDto moviePerson)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace MoviesRatingApp.API.Controllers
                 }
                 var moviePersonEntity = _mapper.Map<MoviePerson>(moviePerson);
                 _repository.MoviePerson.CreateMoviePerson(moviePersonEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 var createdMoviePerson = _mapper.Map<MoviePersonDto>(moviePersonEntity);
                 return CreatedAtRoute("MoviePersonById", new { id = createdMoviePerson.ID }, createdMoviePerson);
             }
@@ -98,7 +98,7 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateMoviePerson(int id, [FromBody] MoviePersonForUpdateDto moviePerson)
+        public async Task<IActionResult> UpdateMoviePerson(int id, [FromBody] MoviePersonForUpdateDto moviePerson)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace MoviesRatingApp.API.Controllers
                     _logger.LogError("Invalid moviePerson object sent from client.");
                     return BadRequest("Invalid model object");
                 }
-                var moviePersonEntity = _repository.MoviePerson.GetMoviePersonById(id);
+                var moviePersonEntity = await _repository.MoviePerson.GetMoviePersonByIdAsync(id);
                 if (moviePersonEntity is null)
                 {
                     _logger.LogError($"MoviePerson with id: {id}, hasn't been found in db.");
@@ -120,7 +120,7 @@ namespace MoviesRatingApp.API.Controllers
                 }
                 _mapper.Map(moviePerson, moviePersonEntity);
                 _repository.MoviePerson.UpdateMoviePerson(moviePersonEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)
@@ -131,18 +131,18 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteMoviePerson(int id)
+        public async Task<IActionResult> DeleteMoviePerson(int id)
         {
             try
             {
-                var moviePerson = _repository.MoviePerson.GetMoviePersonById(id);
+                var moviePerson = await _repository.MoviePerson.GetMoviePersonByIdAsync(id);
                 if (moviePerson == null)
                 {
                     _logger.LogError($"MoviePerson with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 _repository.MoviePerson.DeleteMoviePerson(moviePerson);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)

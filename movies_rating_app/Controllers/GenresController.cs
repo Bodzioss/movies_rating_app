@@ -23,11 +23,11 @@ namespace MoviesRatingApp.API.Controllers
 
         // GET: api/Genres
         [HttpGet]
-        public IActionResult GetAllGenres()
+        public async Task<IActionResult> GetAllGenres()
         {
             try
             {
-                var genres = _repository.Genre.GetAllGenres();
+                var genres = await _repository.Genre.GetAllGenresAsync();
 
                 _logger.LogInfo($"Returned all genres from database.");
 
@@ -37,18 +37,18 @@ namespace MoviesRatingApp.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Something went wrong inside GetGenres action: {ex.Message}");
+                _logger.LogError($"Something went wrong inside GetGenresAsync action: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
 
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetGenreById(int id)
+        public async  Task<IActionResult> GetGenreById(int id)
         {
             try
             {
-                var genre = _repository.Genre.GetGenreById(id);
+                var genre = await _repository.Genre.GetGenreByIdAsync(id);
                 if (genre is null)
                 {
                     _logger.LogError($"Genre with id: {id}, hasn't been found in db.");
@@ -63,13 +63,13 @@ namespace MoviesRatingApp.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Something went wrong inside GetGenreById action: {ex.Message}");
+                _logger.LogError($"Something went wrong inside GetGenreByIdAsync action: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
         }
 
         [HttpPost]
-        public IActionResult CreateGenre([FromBody] GenreForCreationDto genre)
+        public async Task<IActionResult> CreateGenre([FromBody] GenreForCreationDto genre)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace MoviesRatingApp.API.Controllers
                 }
                 var genreEntity = _mapper.Map<Genre>(genre);
                 _repository.Genre.CreateGenre(genreEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 var createdGenre = _mapper.Map<GenreDto>(genreEntity);
                 return CreatedAtRoute("GenreById", new { id = createdGenre.ID }, createdGenre);
             }
@@ -97,7 +97,7 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateGenre(int id, [FromBody] GenreForUpdateDto genre)
+        public async Task<IActionResult> UpdateGenre(int id, [FromBody] GenreForUpdateDto genre)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace MoviesRatingApp.API.Controllers
                     _logger.LogError("Invalid genre object sent from client.");
                     return BadRequest("Invalid model object");
                 }
-                var genreEntity = _repository.Genre.GetGenreById(id);
+                var genreEntity =await _repository.Genre.GetGenreByIdAsync(id);
                 if (genreEntity is null)
                 {
                     _logger.LogError($"Genre with id: {id}, hasn't been found in db.");
@@ -119,7 +119,7 @@ namespace MoviesRatingApp.API.Controllers
                 }
                 _mapper.Map(genre, genreEntity);
                 _repository.Genre.UpdateGenre(genreEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)
@@ -130,18 +130,18 @@ namespace MoviesRatingApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteGenre(int id)
+        public async Task<IActionResult> DeleteGenre(int id)
         {
             try
             {
-                var genre = _repository.Genre.GetGenreById(id);
+                var genre = await _repository.Genre.GetGenreByIdAsync(id);
                 if (genre == null)
                 {
                     _logger.LogError($"Genre with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 _repository.Genre.DeleteGenre(genre);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)

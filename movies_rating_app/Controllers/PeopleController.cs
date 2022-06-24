@@ -29,11 +29,11 @@ namespace PeopleRatingApp.API.Controllers
 
         // GET: api/People
         [HttpGet]
-        public IActionResult GetAllPeople()
+        public async Task<IActionResult> GetAllPeople()
         {
             try
             {
-                var persons = _repository.Person.GetAllPeople();
+                var persons =await _repository.Person.GetAllPeopleAsync();
 
                 _logger.LogInfo($"Returned all persons from database.");
 
@@ -50,11 +50,11 @@ namespace PeopleRatingApp.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetPersonById(int id)
+        public async Task<IActionResult> GetPersonById(int id)
         {
             try
             {
-                var person = _repository.Person.GetPersonById(id);
+                var person =await _repository.Person.GetPersonByIdAsync(id);
                 if (person is null)
                 {
                     _logger.LogError($"Person with id: {id}, hasn't been found in db.");
@@ -75,7 +75,7 @@ namespace PeopleRatingApp.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreatePerson([FromBody] PersonForCreationDto person)
+        public async Task<IActionResult> CreatePerson([FromBody] PersonForCreationDto person)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace PeopleRatingApp.API.Controllers
                 }
                 var personEntity = _mapper.Map<Person>(person);
                 _repository.Person.CreatePerson(personEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 var createdPerson = _mapper.Map<PersonDto>(personEntity);
                 return CreatedAtRoute("PersonById", new { id = createdPerson.ID }, createdPerson);
             }
@@ -103,7 +103,7 @@ namespace PeopleRatingApp.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdatePerson(int id, [FromBody] PersonForUpdateDto person)
+        public async Task<IActionResult> UpdatePerson(int id, [FromBody] PersonForUpdateDto person)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace PeopleRatingApp.API.Controllers
                     _logger.LogError("Invalid person object sent from client.");
                     return BadRequest("Invalid model object");
                 }
-                var personEntity = _repository.Person.GetPersonById(id);
+                var personEntity = await _repository.Person.GetPersonByIdAsync(id);
                 if (personEntity is null)
                 {
                     _logger.LogError($"Person with id: {id}, hasn't been found in db.");
@@ -125,7 +125,7 @@ namespace PeopleRatingApp.API.Controllers
                 }
                 _mapper.Map(person, personEntity);
                 _repository.Person.UpdatePerson(personEntity);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)
@@ -136,18 +136,18 @@ namespace PeopleRatingApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeletePerson(int id)
+        public async Task<IActionResult> DeletePerson(int id)
         {
             try
             {
-                var person = _repository.Person.GetPersonById(id);
+                var person =await _repository.Person.GetPersonByIdAsync(id);
                 if (person == null)
                 {
                     _logger.LogError($"Person with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 _repository.Person.DeletePerson(person);
-                _repository.Save();
+                await _repository.SaveAsync();
                 return NoContent();
             }
             catch (Exception ex)

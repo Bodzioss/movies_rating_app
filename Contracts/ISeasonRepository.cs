@@ -9,8 +9,8 @@ namespace Contracts
 {
     public interface ISeasonRepository : IRepositoryBase<Season>
     {
-        IEnumerable<Season> GetAllSeasons();
-        Season GetSeasonById(int seasonID);
+        Task<IEnumerable<Season>> GetAllSeasonsAsync();
+        Task<Season> GetSeasonByIdAsync(int seasonID);
         void CreateSeason(Season season);
         void UpdateSeason(Season season);
         void DeleteSeason(Season season);
