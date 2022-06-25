@@ -44,7 +44,7 @@ namespace MoviesRatingApp.API.Controllers
 
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "MoviePersonById")]
         public async Task<IActionResult> GetMoviePersonById(int id)
         {
             try
@@ -88,7 +88,7 @@ namespace MoviesRatingApp.API.Controllers
                 _repository.MoviePerson.CreateMoviePerson(moviePersonEntity);
                 await _repository.SaveAsync();
                 var createdMoviePerson = _mapper.Map<MoviePersonDto>(moviePersonEntity);
-                return CreatedAtRoute("MoviePersonByIdAsync", new { id = createdMoviePerson.ID }, createdMoviePerson);
+                return CreatedAtRoute("MoviePersonById", new { id = createdMoviePerson.ID }, createdMoviePerson);
             }
             catch (Exception ex)
             {

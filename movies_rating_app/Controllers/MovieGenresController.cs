@@ -49,7 +49,7 @@ namespace MoviesRatingApp.API.Controllers
 
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "MovieGenreById")]
         public async Task<IActionResult> GetMovieGenreById(int id)
         {
             try
@@ -93,7 +93,7 @@ namespace MoviesRatingApp.API.Controllers
                 _repository.MovieGenre.CreateMovieGenre(movieGenreEntity);
                 await _repository.SaveAsync();
                 var createdMovieGenre = _mapper.Map<MovieGenreDto>(movieGenreEntity);
-                return CreatedAtRoute("MovieGenreByIdAsync", new { id = createdMovieGenre.ID }, createdMovieGenre);
+                return CreatedAtRoute("MovieGenreById", new { id = createdMovieGenre.ID }, createdMovieGenre);
             }
             catch (Exception ex)
             {

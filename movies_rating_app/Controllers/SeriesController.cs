@@ -49,7 +49,7 @@ namespace SeriesRatingApp.API.Controllers
 
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "SeriesById")]
         public async Task<IActionResult> GetSeriesById(int id)
         {
             try
@@ -93,7 +93,7 @@ namespace SeriesRatingApp.API.Controllers
                 _repository.Series.CreateSeries(seriesEntity);
                 await _repository.SaveAsync();
                 var createdSeries = _mapper.Map<SeriesDto>(seriesEntity);
-                return CreatedAtRoute("SeriesByIdAsync", new { id = createdSeries.ID }, createdSeries);
+                return CreatedAtRoute("SeriesById", new { id = createdSeries.ID }, createdSeries);
             }
             catch (Exception ex)
             {

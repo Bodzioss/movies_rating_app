@@ -49,7 +49,7 @@ namespace RolesRatingApp.API.Controllers
 
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "RoleById")]
         public async Task<IActionResult> GetRoleById(int id)
         {
             try
@@ -93,7 +93,7 @@ namespace RolesRatingApp.API.Controllers
                 _repository.Role.CreateRole(roleEntity);
                 await _repository.SaveAsync();
                 var createdRole = _mapper.Map<RoleDto>(roleEntity);
-                return CreatedAtRoute("RoleByIdAsync", new { id = createdRole.ID }, createdRole);
+                return CreatedAtRoute("RoleById", new { id = createdRole.ID }, createdRole);
             }
             catch (Exception ex)
             {

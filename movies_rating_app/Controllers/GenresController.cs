@@ -43,8 +43,8 @@ namespace MoviesRatingApp.API.Controllers
 
         }
 
-        [HttpGet("{id}")]
-        public async  Task<IActionResult> GetGenreById(int id)
+        [HttpGet("{id}", Name = "GenreById")]
+        public async Task<IActionResult> GetGenreById(int id)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace MoviesRatingApp.API.Controllers
                 _repository.Genre.CreateGenre(genreEntity);
                 await _repository.SaveAsync();
                 var createdGenre = _mapper.Map<GenreDto>(genreEntity);
-                return CreatedAtRoute("GenreByIdAsync", new { id = createdGenre.ID }, createdGenre);
+                return CreatedAtRoute("GenreById", new { id = createdGenre.ID }, createdGenre);
             }
             catch (Exception ex)
             {
